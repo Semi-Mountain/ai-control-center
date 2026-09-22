@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#5E6AD2">
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIuWTh+W0veaOp+WItuS4reW/gyIsCiAgInNob3J0X25hbWUiOiAi5ZOH5bS9IiwKICAiZGVzY3JpcHRpb24iOiAiQeiCoeWunuaXtuihjOaDhSArIOWtpuS5oOi/m+W6piArIOezu+e7n+WBpeW6t+W6puS4gOS9k+WMlumdouadvyIsCiAgInN0YXJ0X3VybCI6ICIuLyIsCiAgInNjb3BlIjogIi4vIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAib3JpZW50YXRpb24iOiAiYW55IiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMDgwOTBBIiwKICAidGhlbWVfY29sb3IiOiAiIzVFNkFEMiIsCiAgImxhbmciOiAiemgtQ04iLAogICJjYXRlZ29yaWVzIjogWyJmaW5hbmNlIiwgInByb2R1Y3Rpdml0eSJdLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICIuL2ljb24tMTkyLnBuZyIsCiAgICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIiwKICAgICAgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIgogICAgfSwKICAgIHsKICAgICAgInNyYyI6ICIuL2ljb24tNTEyLnBuZyIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIiwKICAgICAgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIgogICAgfQogIF0KfQ==">
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192-a11a567b-a11a567b.png">
+  <link rel="apple-touch-icon" href="./assets/icon-192-a11a567b-a11a567b.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="哇崽控制台">
+  <title>哇崽控制中心</title>
+  <style>
+    :root {
+      --bg: #08090A;
+      --surface: #0D0E11;
+      --surface-elevated: #15171A;
+      --border: #1E1F24;
+      --purple: #5E6AD2;
+      --purple-dim: #3D4466;
+      --text: #E8E9EC;
+      --text-dim: #6B6D76;
+      --green: #34D399;
+      --yellow: #FBBF24;
+      --red: #F87171;
+      --blue: #60A5FA;
+      --cyan: #22D3EE;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    
+    /* 响应式 - 增强手机端适配 */
+    @media (max-width: 768px) {
+      .app { flex-direction: column !important; }
+      
+      /* 侧边栏转为底部导航 */
+      .sidebar { 
+        width: 100% !important; 
+        height: auto !important; 
+        flex-direction: row !important; 
+        position: fixed !important;
+        bottom: 0 !important;
+        top: auto !important;
+        border-right: none !important; 
+        border-top: 1px solid var(--border) !important;
+        padding: 8px 0 !important;
+        z-index: 1000;
+      }
+      .sidebar-header { display: none !important; }
+      
+      /* 导航项优化 */
+      .nav-item { 
+        flex-direction: column !important;
+        padding: 6px 12px !important;
+        gap: 2px !important;
+      }
+      .nav-item-text { font-size: 10px !important; }
+      .nav-item i { 
+        width: 18px !important; 
+        height: 18px !important;
+        font-size: 16px !important;
+        line-height: 18px !important;
+      }
+      .nav-section {
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        width: 100% !important;
+        gap: 0 !important;
+      }
+      .nav-badge {
+        position: absolute !important;
+        top: 2px !important;
+        right: 4px !important;
+        font-size: 8px !important;
+        padding: 1px 4px !important;
+      }
+      .nav-item {
+        position: relative !important;
+      }
+      .sidebar-footer {
+        display: none !important;
+      }
+      
+      /* 主内容区 */
+      .main { 
+        padding: 12px !important; 
+        padding-bottom: 80px !important;
+        overflow-y: auto !important;
+      }
+      
+      /* 顶部栏 */
+      .topbar { padding: 8px 12px !important; }
+      .command-trigger { display: none !important; }
+      .clock { display: none !important; }
+      
+      /* 网格布局 */
+      .hero-stats { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr !important; gap: 8px !important; }
+      .stock-grid { grid-template-columns: 1fr !important; }
+      
+      /* 卡片 */
+      .card { padding: 12px !important; margin-bottom: 8px !important; }
+      .card-title { font-size: 14px !important; }
+      
+      /* 表格/列表 */
+      .zdt-row { font-size: 11px !important; padding: 6px 4px !important; }
+      .hold-row { font-size: 11px !important; padding: 8px !important; }
+      
+      /* 字体大小 */
+      body { font-size: 12px !important; }
+      h1, .page-title { font-size: 18px !important; }
+      h2 { font-size: 16px !important; }
+      
+      /* 弹窗全屏 */
+      .modal-content {
+        width: 95% !important;
+        max-height: 90vh !important;
+        border-radius: 12px 12px 0 0 !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        top: auto !important;
+      }
+      .modal { align-items: flex-end !important; }
+    }
+    
+    @media (min-width: 769px) {
+      .sidebar { width: 240px; }
+      .main { flex: 1; overflow-y: auto; }
+    }
+    
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
+    }
+    
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--purple), #8B5CF6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+    }
+    
+    .brand-info { flex: 1; }
+    .brand-name { font-size: 16px; font-weight: 600; display: block; }
+    .brand-version { font-size: 11px; color: var(--text-dim); }
+    
+    .nav-section {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .nav-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 8px 12px 4px;
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text-dim);
+      font-size: 14px;
+    }
+    
+    .nav-item:hover {
+      background: var(--surface-elevated);
+      color: var(--text);
+    }
+    
+    .nav-item.active {
+      background: rgba(94, 106, 210, 0.15);
+      color: var(--purple);
+    }
+    
+    .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .nav-badge { margin-left: auto; background: var(--purple); color: white; font-size: 10px; padding: 2px 8px; border-radius: 10px; }
+    
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px;
+      border-top: 1px solid var(--border);
+    }
+    
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    /* 刷新频率调节条 */
+    .refresh-freq-bar {
+      display: flex;
+      gap: 4px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .refresh-freq-btn {
+      flex: 1;
+      min-width: 40px;
+      padding: 4px 6px;
+      font-size: 11px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .refresh-freq-btn:hover {
+      border-color: var(--purple-dim);
+      color: var(--text);
+    }
+    .refresh-freq-btn.active {
+      background: var(--purple);
+      border-color: var(--purple);
+      color: white;
+      font-weight: 600;
+    }
+    .refresh-countdown {
+      flex-basis: 100%;
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-dim);
+      font-family: 'SF Mono', Monaco, monospace;
+      margin-top: 4px;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* 主内容 */
+    .main {
+      flex: 1;
+      margin-left: 240px;
+      padding: 24px;
+      background: var(--bg);
+    }
+    
+    .page { display: none; }
+    .page.active { display: block; animation: fadeIn 0.3s ease; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    
+    .page-title { font-size: 24px; font-weight: 700; }
+    .page-subtitle { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+    
+    .refresh-btn {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .refresh-btn:hover { background: var(--purple-dim); }
+    
+    /* 卡片 */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .card-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+    }
+    
+    /* Hero 区域 */
+    .hero {
+      background: linear-gradient(135deg, rgba(94, 106, 210, 0.1), rgba(139, 92, 246, 0.1));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    
+    .hero-greeting {
+      margin-bottom: 20px;
+    }
+    
+    .hero-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .hero-status {
+      font-size: 15px;
+      color: var(--purple);
+    }
+    
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    
+    .hero-stat {
+      text-align: center;
+      padding: 12px;
+      background: var(--surface);
+      border-radius: 12px;
+    }
+    
+    .hero-stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--purple);
+    }
+    
+    .hero-stat-label {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+    
+    /* 网格 */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    
+    /* 股票卡片 */
+    .stock-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    
+    .stock-card {
+      background: var(--surface-elevated);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    
+    .stock-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .stock-code { font-size: 12px; color: var(--text-dim); margin-bottom: 12px; }
+    .stock-price { font-size: 22px; font-weight: 700; }
+    .stock-change { font-size: 14px; margin-left: 8px; }
+    .stock-change.up { color: var(--red); }
+    .stock-change.down { color: var(--green); }
+    .stock-theme { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; padding: 2px 8px; background: var(--surface); border-radius: 4px; display: inline-block; }
+    .stock-price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+    .stock-cost { font-size: 12px; color: var(--text-dim); }
+    .stock-cost.up { color: var(--red); }
+    .stock-cost.down { color: var(--green); }
+    
+    /* 大盘指数条 */
+    .indices-bar { display: flex; gap: 12px; flex-wrap: wrap; }
+    .index-pill {
+      flex: 1;
+      min-width: 110px;
+      background: var(--surface-elevated);
+      padding: 12px 16px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .index-name { font-size: 11px; color: var(--text-dim); }
+    .index-value { font-size: 18px; font-weight: 600; }
+    .index-change.up { color: var(--red); font-size: 13px; font-weight: 500; }
+    .index-change.down { color: var(--green); font-size: 13px; font-weight: 500; }
+    .indices-empty { color: var(--text-dim); font-size: 13px; padding: 8px 0; }
+    .card-subtitle { font-size: 11px; color: var(--text-dim); }
+    
+    /* 学习卡片 */
+    .learn-card {
+      background: var(--surface-elevated);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 12px;
+    }
+    
+    .learn-time { font-size: 12px; color: var(--purple); margin-bottom: 8px; }
+    .learn-topic { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+    .learn-summary { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+    .learn-tags { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .learn-tag { font-size: 11px; padding: 4px 10px; background: var(--surface); border-radius: 6px; color: var(--text-dim); }
+    
+    /* 时间线 */
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    
+    .timeline-item {
+      position: relative;
+      padding-bottom: 20px;
+    }
+    
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -24px;
+      top: 4px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 2px solid var(--purple);
+    }
+    
+    .timeline-item.done::before { background: var(--green); border-color: var(--green); }
+    
+    .timeline-time { font-size: 12px; color: var(--purple); margin-bottom: 4px; }
+    .timeline-content { font-size: 14px; }
+    
+    /* 列表 */
+    .list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .list-item:last-child { border-bottom: none; }
+    
+    .list-left { display: flex; align-items: center; gap: 12px; }
+    .list-emoji { font-size: 18px; }
+    .list-content { flex: 1; }
+    .list-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+    .list-desc { font-size: 12px; color: var(--text-dim); }
+    .list-time { font-size: 12px; color: var(--purple); font-weight: 500; }
+    
+    /* 健康度 */
+    .health-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .health-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    
+    .health-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+    }
+    
+    .health-label { font-size: 13px; width: 80px; }
+    .health-value { font-size: 13px; color: var(--text-dim); width: 40px; text-align: right; }
+    
+    /* 空状态 */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-dim);
+    }
+    
+    .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+    .empty-text { font-size: 14px; }
+    
+    /* 系统卡片 */
+    .sys-card {
+      background: var(--surface-elevated);
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .sys-icon { font-size: 24px; margin-bottom: 8px; }
+    .sys-value { font-size: 20px; font-weight: 700; }
+    .sys-label { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+    /* 每日报告 */
+    .report-item {
+      padding: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 4px;
+      border: 1px solid transparent;
+    }
+    .report-item:hover { background: var(--surface-elevated); }
+    .report-item.active {
+      background: rgba(94, 106, 210, 0.12);
+      border-color: var(--purple-dim);
+    }
+    .report-date { font-size: 14px; font-weight: 600; color: var(--purple); }
+    .report-title { font-size: 12px; color: var(--text); margin-top: 2px; line-height: 1.4; }
+    .report-meta { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+    @media (max-width: 768px) {
+      #page-reports > div { grid-template-columns: 1fr !important; }
+      .report-item { padding: 10px; }
+    }
+
+    /* 简易 markdown 渲染样式 */
+    .md-body h1, .md-body h2, .md-body h3 {
+      color: var(--purple);
+      margin: 18px 0 10px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .md-body h1 { font-size: 22px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .md-body h2 { font-size: 18px; }
+    .md-body h3 { font-size: 15px; }
+    .md-body p { margin: 8px 0; color: var(--text); }
+    .md-body ul, .md-body ol { margin: 8px 0 8px 20px; color: var(--text); }
+    .md-body li { margin: 4px 0; }
+    .md-body code {
+      background: var(--surface-elevated);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--cyan);
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+    .md-body pre {
+      background: var(--surface-elevated);
+      padding: 12px 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+    .md-body pre code { background: transparent; padding: 0; color: var(--text); }
+    .md-body blockquote {
+      border-left: 3px solid var(--purple);
+      padding: 4px 12px;
+      margin: 10px 0;
+      color: var(--text-dim);
+      background: rgba(94, 106, 210, 0.05);
+      border-radius: 0 6px 6px 0;
+    }
+    .md-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+    .md-body th, .md-body td {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    .md-body th { background: var(--surface-elevated); color: var(--purple); font-weight: 600; }
+    .md-body hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+    .md-body strong { color: var(--purple); font-weight: 600; }
+    .md-body em { color: var(--cyan); font-style: italic; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="avatar">崽</div>
+        <div class="brand-info">
+          <span class="brand-name">哇崽控制中心</span>
+          <span class="brand-version">v3.3 · GitHub Pages</span>
+        </div>
+      </div>
+      
+      <nav class="nav-section">
+        <div class="nav-item active" data-page="status">
+          <i>📊</i>
+          <span class="nav-item-text">控制台</span>
+        </div>
+        <div class="nav-item" data-page="stocks">
+          <i>📈</i>
+          <span class="nav-item-text">持仓</span>
+          <span class="nav-badge">3</span>
+        </div>
+        <div class="nav-item" data-page="learning">
+          <i>📚</i>
+          <span class="nav-item-text">学习</span>
+        </div>
+        <div class="nav-item" data-page="reports">
+          <i>📋</i>
+          <span class="nav-item-text">报告</span>
+          <span class="nav-badge" id="reportsBadge">7天</span>
+        </div>
+        <div class="nav-item" data-page="timeline">
+          <i>📅</i>
+          <span class="nav-item-text">任务</span>
+        </div>
+        <div class="nav-item" data-page="introspect">
+          <i>🔍</i>
+          <span class="nav-item-text">自省</span>
+        </div>
+        <div class="nav-item" data-page="tools">
+          <i>🛠️</i>
+          <span class="nav-item-text">工具</span>
+        </div>
+        <div class="nav-item" data-page="memory">
+          <i>🧠</i>
+          <span class="nav-item-text">记忆</span>
+        </div>
+        <div class="nav-item" data-page="system">
+          <i>⚙️</i>
+          <span class="nav-item-text">设置</span>
+        </div>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="status-bar">
+          <div class="status-dot"></div>
+          <span>飞书已连接 · M2.5</span>
+        </div>
+        <div class="refresh-freq-bar" id="refreshFreqBar"></div>
+      </div>
+    </aside>
+    
+    <!-- 主内容 -->
+    <main class="main">
+      <!-- 控制台页 -->
+      <div class="page active" id="page-status">
+        <div class="page-header">
+          <div>
+            <div class="page-title">控制台</div>
+            <div class="page-subtitle" id="currentTime">--</div>
+          </div>
+          <button class="refresh-btn" onclick="refreshAll()">
+            <span>🔄</span> 刷新
+          </button>
+        </div>
+        
+        <!-- Hero -->
+        <div class="hero">
+          <div class="hero-greeting">
+            <h1 class="hero-title">嗨，爸爸</h1>
+            <div class="hero-status" id="heroStatus">正在加载状态...</div>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <div class="hero-stat-value" id="statTasks">19</div>
+              <div class="hero-stat-label">总任务</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-value" id="statActive">18</div>
+              <div class="hero-stat-label">活跃</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-value" id="statPush">9</div>
+              <div class="hero-stat-label">飞书推送</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-value" id="statSkills">6</div>
+              <div class="hero-stat-label">技能</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 大盘指数 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📊 大盘指数</span>
+            <span class="card-subtitle" id="marketTimestamp">--</span>
+          </div>
+          <div class="indices-bar" id="marketIndices">
+            <div class="indices-empty">数据加载中...</div>
+          </div>
+        </div>
+        
+        <!-- 持仓概览 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📈 持仓概览</span>
+            <button class="refresh-btn" style="padding: 6px 12px; font-size: 12px;" onclick="showPage('stocks')">查看详情 →</button>
+          </div>
+          <div class="stock-grid" id="heroStocks">
+            <!-- 动态加载 -->
+          </div>
+        </div>
+        
+        <!-- 今日学习 -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📚 今日学习</span>
+            <button class="refresh-btn" style="padding: 6px 12px; font-size: 12px;" onclick="showPage('learning')">查看详情 →</button>
+          </div>
+          <div id="heroLearning">
+            <!-- 动态加载 -->
+          </div>
+        </div>
+
+        <!-- 今日方法论 -->
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-header">
+            <span class="card-title">🧠 今日方法论</span>
+            <span class="card-subtitle" id="methodologyTimestamp">--</span>
+          </div>
+          <div id="heroMethodology">
+            <!-- 动态加载 -->
+          </div>
+        </div>
+
+        <!-- 数据源状态 -->
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">🌐 通信状态</span>
+            </div>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 8px;"><div class="status-dot"></div><span>飞书</span></div>
+              <div style="display: flex; align-items: center; gap: 8px;"><div class="status-dot"></div><span>模型 M2.5</span></div>
+              <div style="display: flex; align-items: center; gap: 8px;"><div class="status-dot"></div><span>akshare</span></div>
+              <div style="display: flex; align-items: center; gap: 8px;"><div class="status-dot"></div><span>妙想MX</span></div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">⏰ 下一任务</span>
+            </div>
+            <div style="font-size: 15px;">
+              <span id="nextTaskTime">16:00</span> · <span id="nextTaskName">复盘报告</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 持仓监控页 -->
+      <div class="page" id="page-stocks">
+        <div class="page-header">
+          <div>
+            <div class="page-title">持仓监控</div>
+            <div class="page-subtitle">实时行情 · 每日更新</div>
+          </div>
+          <button class="refresh-btn" onclick="refreshStocks()">
+            <span>🔄</span> 刷新行情
+          </button>
+        </div>
+        
+        <div class="stock-grid" id="stocksGrid">
+          <!-- 动态加载 -->
+        </div>
+        
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-header">
+            <span class="card-title">关注标的</span>
+          </div>
+          <div class="list-item">
+            <div class="list-left">
+              <span class="list-emoji">🏭</span>
+              <div class="list-content">
+                <div class="list-title">华工科技</div>
+                <div class="list-desc">AI算力 · 光模块</div>
+              </div>
+            </div>
+            <span class="list-time">000988</span>
+          </div>
+          <div class="list-item">
+            <div class="list-left">
+              <span class="list-emoji">🚢</span>
+              <div class="list-content">
+                <div class="list-title">北部湾港</div>
+                <div class="list-desc">港口航运 · 西部陆海新通道</div>
+              </div>
+            </div>
+            <span class="list-time">000582</span>
+          </div>
+          <div class="list-item">
+            <div class="list-left">
+              <span class="list-emoji">🛰️</span>
+              <div class="list-content">
+                <div class="list-title">中国卫星</div>
+                <div class="list-desc">卫星应用 · 航天军工</div>
+              </div>
+            </div>
+            <span class="list-time">600118</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 学习记录页 -->
+      <div class="page" id="page-learning">
+        <div class="page-header">
+          <div>
+            <div class="page-title">学习记录</div>
+            <div class="page-subtitle">每日学习 · 持续进化</div>
+          </div>
+          <button class="refresh-btn" onclick="refreshLearning()">
+            <span>🔄</span> 刷新
+          </button>
+        </div>
+        
+        <div class="card" id="learningContent">
+          <!-- 动态加载 -->
+        </div>
+      </div>
+
+      <!-- 每日报告页 -->
+      <div class="page" id="page-reports">
+        <div class="page-header">
+          <div>
+            <div class="page-title">每日报告</div>
+            <div class="page-subtitle" id="reportsSubtitle">最近 7 天 · 实时同步</div>
+          </div>
+          <button class="refresh-btn" onclick="refreshReports()">
+            <span>🔄</span> 刷新
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 280px 1fr; gap: 16px;">
+          <!-- 左侧：日期列表 -->
+          <div class="card" style="padding: 12px; margin-bottom: 0;">
+            <div class="card-header" style="margin-bottom: 8px;">
+              <span class="card-title">📅 历史报告</span>
+            </div>
+            <div id="reportsList" style="max-height: 70vh; overflow-y: auto;">
+              <div style="text-align: center; padding: 20px; color: var(--text-dim); font-size: 13px;">
+                加载中...
+              </div>
+            </div>
+          </div>
+
+          <!-- 右侧：报告详情 -->
+          <div class="card" id="reportsDetail">
+            <div class="card-header">
+              <span class="card-title" id="reportsDetailTitle">📋 报告详情</span>
+              <span class="card-title" id="reportsDetailMeta" style="color: var(--text-dim);"></span>
+            </div>
+            <div id="reportsDetailContent" style="max-height: 75vh; overflow-y: auto; line-height: 1.7;">
+              <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <div class="empty-text">从左侧选一份报告查看完整内容</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<!-- 任务时间线页 -->
+      <div class="page" id="page-timeline">
+        <div class="page-header">
+          <div>
+            <div class="page-title">任务时间线</div>
+            <div class="page-subtitle">今日任务进度</div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="timeline" id="timelineContent">
+            <!-- 动态加载 -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- 系统自省页 -->
+      <div class="page" id="page-introspect">
+        <div class="page-header">
+          <div>
+            <div class="page-title">系统自省</div>
+            <div class="page-subtitle">底层运行状态 · 实时监控</div>
+          </div>
+        </div>
+        
+        <div class="grid-4">
+          <div class="sys-card">
+            <div class="sys-icon">📊</div>
+            <div class="sys-value" id="sysCron">19</div>
+            <div class="sys-label">定时任务</div>
+          </div>
+          <div class="sys-card">
+            <div class="sys-icon">🎯</div>
+            <div class="sys-value" id="sysPush">9</div>
+            <div class="sys-label">飞书推送</div>
+          </div>
+          <div class="sys-card">
+            <div class="sys-icon">📚</div>
+            <div class="sys-value" id="sysSkills">6</div>
+            <div class="sys-label">技能包</div>
+          </div>
+          <div class="sys-card">
+            <div class="sys-icon">💾</div>
+            <div class="sys-value" id="sysDb">3</div>
+            <div class="sys-label">数据源</div>
+          </div>
+        </div>
+        
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-header">
+            <span class="card-title">💓 健康度</span>
+          </div>
+          <div class="health-item">
+            <span class="health-label">运行状态</span>
+            <div class="health-bar" style="flex:1;"><div class="health-fill" style="width: 95%;"></div></div>
+            <span class="health-value">95%</span>
+          </div>
+          <div class="health-item">
+            <span class="health-label">数据同步</span>
+            <div class="health-bar" style="flex:1;"><div class="health-fill" style="width: 90%;"></div></div>
+            <span class="health-value">90%</span>
+          </div>
+          <div class="health-item">
+            <span class="health-label">API连通</span>
+            <div class="health-bar" style="flex:1;"><div class="health-fill" style="width: 100%;"></div></div>
+            <span class="health-value">100%</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 工具分析页 -->
+      <div class="page" id="page-tools">
+        <div class="page-header">
+          <div>
+            <div class="page-title">工具分析</div>
+            <div class="page-subtitle">调用频次 · 技能分布</div>
+          </div>
+        </div>
+        
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">📊 技能包</span>
+            </div>
+            <div class="list-item">
+              <div class="list-left">
+                <span class="list-emoji">📊</span>
+                <div class="list-content">
+                  <div class="list-title">mx-data</div>
+                  <div class="list-desc">金融数据查询</div>
+                </div>
+              </div>
+              <span class="list-time">已安装</span>
+            </div>
+            <div class="list-item">
+              <div class="list-left">
+                <span class="list-emoji">🔍</span>
+                <div class="list-content">
+                  <div class="list-title">mx-search</div>
+                  <div class="list-desc">股票搜索</div>
+                </div>
+              </div>
+              <span class="list-time">已安装</span>
+            </div>
+            <div class="list-item">
+              <div class="list-left">
+                <span class="list-emoji">🎯</span>
+                <div class="list-content">
+                  <div class="list-title">mx-xuangu</div>
+                  <div class="list-desc">选股工具</div>
+                </div>
+              </div>
+              <span class="list-time">已安装</span>
+            </div>
+            <div class="list-item">
+              <div class="list-left">
+                <span class="list-emoji">⭐</span>
+                <div class="list-content">
+                  <div class="list-title">mx-zixuan</div>
+                  <div class="list-desc">自选股管理</div>
+                </div>
+              </div>
+              <span class="list-time">已安装</span>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">🔌 外部集成</span>
+            </div>
+            <div class="list-item">
+              <div class="list-left">
+                <span class="list-emoji">📡</span>
+                <div class="list-content">
+                  <div class="list-title">akshare</div>
+                  <div class="list-desc">A股行情数据</div>
+                </div>
+              </div>
+              <span class="list-time">主数据源</span>
+            </div>
+            <div class="list-item">
+              <div class="list-left">
+                <span class="list-emoji">💹</span>
+                <div class="list-content">
+                  <div class="list-title">妙想MX</div>
+                  <div class="list-desc">东方财富API</div>
+                </div>
+              </div>
+              <span class="list-time">备用</span>
+            </div>
+            <div class="list-item">
+              <div class="list-left">
+                <span class="list-emoji">📈</span>
+                <div class="list-content">
+                  <div class="list-title">baostock</div>
+                  <div class="list-desc">金融数据</div>
+                </div>
+              </div>
+              <span class="list-time">第三备</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 记忆管理页 -->
+      <div class="page" id="page-memory">
+        <div class="page-header">
+          <div>
+            <div class="page-title">记忆管理</div>
+            <div class="page-subtitle">跨会话持久记忆</div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">🧠 记忆文件</span>
+          </div>
+          <div class="list-item">
+            <div class="list-left">
+              <span class="list-emoji">📝</span>
+              <div class="list-content">
+                <div class="list-title">用户信息</div>
+                <div class="list-desc">爸爸的基本信息、偏好、投资风格</div>
+              </div>
+            </div>
+              <span class="list-time">持久</span>
+          </div>
+          <div class="list-item">
+            <div class="list-left">
+              <span class="list-emoji">💼</span>
+              <div class="list-content">
+                <div class="list-title">技能库</div>
+                <div class="list-desc">已安装的技能清单</div>
+              </div>
+            </div>
+              <span class="list-time">持久</span>
+          </div>
+          <div class="list-item">
+            <div class="list-left">
+              <span class="list-emoji">📅</span>
+              <div class="list-content">
+                <div class="list-title">改进日志</div>
+                <div class="list-desc">自我改进记录</div>
+              </div>
+            </div>
+              <span class="list-time">持久</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 系统设置页 -->
+      <div class="page" id="page-system">
+        <div class="page-header">
+          <div>
+            <div class="page-title">系统设置</div>
+            <div class="page-subtitle">配置与状态</div>
+          </div>
+        </div>
+        
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">ℹ️ 版本信息</span>
+            </div>
+            <div class="list-item">
+              <div class="list-content">
+                <div class="list-title">控制台版本</div>
+                <div class="list-desc">v3.2</div>
+              </div>
+            </div>
+            <div class="list-item">
+              <div class="list-content">
+                <div class="list-title">AI模型</div>
+                <div class="list-desc">MiniMax M2.5</div>
+              </div>
+            </div>
+            <div class="list-item">
+              <div class="list-content">
+                <div class="list-title">部署平台</div>
+                <div class="list-desc">GitHub Pages</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">🌐 数据源</span>
+            </div>
+            <div class="list-item">
+              <div class="list-content">
+                <div class="list-title">主数据源</div>
+                <div class="list-desc">akshare</div>
+              </div>
+              <div class="status-dot"></div>
+            </div>
+            <div class="list-item">
+              <div class="list-content">
+                <div class="list-title">备用数据源</div>
+                <div class="list-desc">妙想MX</div>
+              </div>
+              <div class="status-dot"></div>
+            </div>
+            <div class="list-item">
+              <div class="list-content">
+                <div class="list-title">第三数据源</div>
+                <div class="list-desc">baostock</div>
+              </div>
+              <div class="status-dot"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-header">
+            <span class="card-title">⏰ Cron 任务</span>
+          </div>
+          <div class="list-item">
+            <div class="list-content">
+              <div class="list-title">总任务数</div>
+            </div>
+            <span class="list-time">19</span>
+          </div>
+          <div class="list-item">
+            <div class="list-content">
+              <div class="list-title">活跃任务</div>
+            </div>
+            <span class="list-time">18</span>
+          </div>
+          <div class="list-item">
+            <div class="list-content">
+              <div class="list-title">飞书推送</div>
+            </div>
+            <span class="list-time">9</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // 任务队列
+    const taskQueue = [
+      { time: '16:00', name: '复盘报告', emoji: '📊' },
+      { time: '14:30', name: '下午小结', emoji: '💹' },
+      { time: '11:30', name: '午盘小结', emoji: '💹' },
+      { time: '10:30', name: '盘中小结', emoji: '💹' },
+      { time: '09:30', name: '早盘分析', emoji: '📈' },
+      { time: '09:25', name: '集合竞价', emoji: '🎯' },
+      { time: '08:00', name: '早盘情报', emoji: '🌅' },
+      { time: '07:30', name: '学习总结', emoji: '📝' },
+      { time: '07:00', name: '辩论讨论', emoji: '⚖️' }
+    ];
+    
+    // 学习记录（静态演示）
+    const learningRecords = [
+      { time: '06:00', topic: '全球宏观', summary: '学习全球宏观经济趋势，了解地缘政治对市场的影响', tags: ['宏观', '地缘政治'] },
+      { time: '05:00', topic: '先进制造', summary: '研究机器人产业链，七腾机器人概念股分析', tags: ['机器人', '智能制造'] },
+      { time: '04:00', topic: '数学+物理', summary: '巩固数学基础，概率论与数理统计复习', tags: ['数学', '概率论'] },
+      { time: '03:00', topic: 'A股+量化', summary: '学习量化策略，了解多因子模型应用', tags: ['量化', '因子模型'] },
+      { time: '02:00', topic: '金融市场', summary: '分析金融市场运行规律，货币政策影响', tags: ['金融', '货币'] },
+      { time: '01:00', topic: 'AI大模型', summary: '学习最新AI前沿论文，Transformer改进方向', tags: ['AI', '大模型'] },
+      { time: '00:00', topic: 'AI前沿+算力', summary: '学习华为昇腾产业链，算力基础设施建设', tags: ['昇腾', '算力'] }
+    ];
+    
+    // 页面导航
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const page = item.dataset.page;
+        showPage(page);
+      });
+    });
+    
+    function showPage(page) {
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
+      document.getElementById(`page-${page}`).classList.add('active');
+    }
+    
+    // 更新时间
+    function updateTime() {
+      const now = new Date();
+      const hour = String(now.getHours()).padStart(2, '0');
+      const minute = String(now.getMinutes()).padStart(2, '0');
+      const second = String(now.getSeconds()).padStart(2, '0');
+      const dateFull = now.getFullYear() + '/' + String(now.getMonth()+1).padStart(2,'0') + '/' + String(now.getDate()).padStart(2,'0');
+      const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+      
+      document.getElementById('currentTime').textContent = `${dateFull} ${weekdays[now.getDay()]} ${hour}:${minute}`;
+      updateStatus(now);
+    }
+    
+    // 更新状态
+    function updateStatus(now) {
+      const hour = now.getHours();
+      const minute = now.getMinutes();
+      const weekday = now.getDay();
+      const isWeekend = weekday === 0 || weekday === 6;
+      
+      let status = '';
+      if (hour < 7) {
+        const topics = ['AI前沿+算力', 'AI大模型+编程', '金融市场+宏观', 'A股+量化', '数学+物理', '先进制造', '全球宏观'];
+        status = `学习中: ${topics[hour < 6 ? hour : 6]}`;
+      } else if (hour === 7 && minute < 30) {
+        status = '辩论中: 正反方讨论';
+      } else if (hour === 7 && minute >= 30) {
+        status = '总结中: 整合学习成果';
+      } else if (hour === 8 || (hour === 9 && minute < 25)) {
+        status = '早盘情报: 收集隔夜信息';
+      } else if (hour === 9 && minute >= 25 && minute < 30) {
+        status = '集合竞价: 分析开盘';
+      } else if (hour === 9 && minute >= 30) {
+        status = '早盘分析: 持仓监控';
+      } else if (hour >= 10 && hour < 12) {
+        status = '盘中小结: 跟踪走势';
+      } else if (hour >= 12 && hour < 13) {
+        status = '午休中';
+      } else if (hour >= 13 && hour < 15) {
+        status = '下午监控: 板块轮动';
+      } else if (hour >= 15 && hour < 16) {
+        status = '盘后整理';
+      } else if (hour === 16) {
+        status = '复盘报告: 生成总结';
+      } else {
+        status = isWeekend ? '周末休息' : '等待明天';
+      }
+      
+      document.getElementById('heroStatus').textContent = status;
+      
+      // 下一任务
+      const nowTime = hour * 60 + minute;
+      let nextTask = taskQueue.find(t => {
+        const [h, m] = t.time.split(':');
+        return parseInt(h) * 60 + parseInt(m) > nowTime;
+      });
+      
+      if (nextTask) {
+        document.getElementById('nextTaskTime').textContent = nextTask.time;
+        document.getElementById('nextTaskName').textContent = nextTask.name;
+      }
+    }
+    
+    // 渲染持仓
+    let holdingsData = [];     // 全局缓存
+    let holdingsMap = {};      // 全局缓存
+    let marketData = null;     // 大盘指数
+    let stocksQuoteCache = {}; // 行情缓存
+
+    async function loadHoldingsData() {
+      try {
+        const [hr, mr, qr] = await Promise.all([
+          fetch('./data/holdings.json?t=' + Date.now()).then(r => r.ok ? r.json() : []),
+          fetch('./data/holdings_map.json?t=' + Date.now()).then(r => r.ok ? r.json() : {}),
+          fetch('./data/market.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null)
+        ]);
+        // 持仓基本信息（成本/股数/代码）
+        holdingsData = Array.isArray(hr) ? hr : [];
+        // 主题/板块映射
+        holdingsMap = (mr && mr.holdings) ? mr.holdings : {};
+        // 大盘指数 + 实时行情
+        marketData = qr;
+        // 把行情缓存起来（key = code）
+        if (qr && Array.isArray(qr.holdings)) {
+          stocksQuoteCache = {};
+          qr.holdings.forEach(h => {
+            stocksQuoteCache[h.code] = {
+              price: h.last,
+              change_pct: h.change_pct,
+              change_str: (h.change_pct > 0 ? '+' : '') + h.change_pct.toFixed(2) + '%',
+              pnl_pct: h.pnl_pct,
+              pnl: h.pnl,
+              market_value: h.market_value,
+              high: h.high,
+              low: h.low,
+              open: h.open,
+              volume: h.volume,
+              name: h.name
+            };
+          });
+        }
+        return true;
+      } catch (e) {
+        console.warn('[holdings] load failed:', e);
+        return false;
+      }
+    }
+
+    async function renderStocks(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      // 懒加载：首次才 fetch
+      if (!holdingsData.length && Object.keys(stocksQuoteCache).length === 0) {
+        await loadHoldingsData();
+      }
+      const stocks = holdingsData.length ? holdingsData : [
+        { name: '数据加载中...', code: '--', shares: 0, cost: 0, group: '' }
+      ];
+      let html = '';
+      stocks.forEach(stock => {
+        const q = stocksQuoteCache[stock.code] || {};
+        const price = q.price !== undefined ? q.price : (q.last || '--');
+        const changePct = q.change_pct !== undefined ? q.change_pct : null;
+        const changeStr = q.change_str || '加载中';
+        const changeClass = changePct === null ? '' : (changePct > 0 ? 'up' : (changePct < 0 ? 'down' : ''));
+        const map = holdingsMap[stock.code] || {};
+        // 盈亏计算（如果有行情）
+        const pnlPct = q.pnl_pct !== undefined ? q.pnl_pct : null;
+        const pnlClass = pnlPct === null ? '' : (pnlPct > 0 ? 'up' : (pnlPct < 0 ? 'down' : ''));
+        const pnlStr = pnlPct === null ? '' : `盈亏 ${pnlPct > 0 ? '+' : ''}${pnlPct.toFixed(1)}%`;
+        html += `
+          <div class="stock-card">
+            <div class="stock-name">${stock.name || q.name || stock.code}</div>
+            <div class="stock-code">${stock.code} · ${stock.shares}股</div>
+            <div class="stock-theme">${map.primary || stock.group || ''}</div>
+            <div class="stock-price-row">
+              <span class="stock-price">${price}</span>
+              <span class="stock-change ${changeClass}">${changeStr}</span>
+            </div>
+            ${stock.cost ? `<div class="stock-cost ${pnlClass}">成本 ${stock.cost.toFixed(2)} · ${pnlStr}</div>` : ''}
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    // 渲染大盘指数（hero 区）
+    function renderMarketIndices(containerId) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      if (!marketData || !marketData.indices) {
+        el.innerHTML = '<div class="indices-empty">大盘数据未加载</div>';
+        return;
+      }
+      const indices = marketData.indices;
+      const html = Object.entries(indices).map(([name, v]) => {
+        const cls = (v.change_pct || 0) > 0 ? 'up' : ((v.change_pct || 0) < 0 ? 'down' : '');
+        return `
+          <div class="index-pill">
+            <span class="index-name">${name}</span>
+            <span class="index-value">${(v.value || 0).toFixed(2)}</span>
+            <span class="index-change ${cls}">${v.change_pct > 0 ? '+' : ''}${v.change_pct.toFixed(2)}%</span>
+          </div>
+        `;
+      }).join('');
+      el.innerHTML = html;
+      // 更新时间戳
+      const ts = marketData.timestamp ? new Date(marketData.timestamp * 1000).toLocaleString('zh-CN') : '--';
+      const tsEl = document.getElementById('marketTimestamp');
+      if (tsEl) tsEl.textContent = ts;
+    }
+    
+    // 渲染方法论
+    let methodologyData = null;
+    async function loadMethodologyData() {
+      try {
+        const r = await fetch('./data/methodology_today.json?t=' + Date.now());
+        if (r.ok) {
+          methodologyData = await r.json();
+          renderHeroMethodology();
+        }
+      } catch (e) {
+        console.warn('方法论数据加载失败', e);
+      }
+    }
+
+    function renderHeroMethodology() {
+      const container = document.getElementById('heroMethodology');
+      const tsEl = document.getElementById('methodologyTimestamp');
+      if (!container) return;
+
+      if (!methodologyData || !methodologyData.today) {
+        container.innerHTML = '<div style="font-size: 14px; color: var(--text-dim);">今天还没产出方法论</div>';
+        if (tsEl) tsEl.textContent = '尚未生成';
+        return;
+      }
+
+      const today = methodologyData.today;
+      const stats = methodologyData.stats || {};
+      if (tsEl) tsEl.textContent = `${today.date} · ${stats.knowledge_count || 0}知识点 · ${stats.methodology_count || 0}方法论`;
+
+      // 取前 2 个方法论代码块做预览
+      const methods = (today.methodologies || []).slice(0, 2);
+      let html = '';
+      methods.forEach((m, i) => {
+        const preview = m.content.split('\n').slice(0, 5).join('\n');
+        html += `
+          <div style="margin-bottom: 12px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 6px;">
+            <div style="font-size: 12px; color: var(--accent); margin-bottom: 6px;">📐 ${m.category}</div>
+            <pre style="font-size: 12px; line-height: 1.6; color: var(--text); margin: 0; white-space: pre-wrap; font-family: 'JetBrains Mono', monospace;">${preview}</pre>
+          </div>
+        `;
+      });
+      // 知识点速览（分类）
+      const knowledgePreview = (today.knowledge || []).slice(0, 4);
+      if (knowledgePreview.length) {
+        html += '<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1);">';
+        knowledgePreview.forEach(k => {
+          html += `<div style="font-size: 12px; line-height: 1.7; color: var(--text-dim);">· <span style="color: var(--accent);">${k.category}</span> ${k.point}</div>`;
+        });
+        html += '</div>';
+      }
+      container.innerHTML = html;
+    }
+
+    // 渲染学习
+    function renderLearning(containerId) {
+      const container = document.getElementById(containerId);
+      let html = '';
+      
+      if (containerId === 'heroLearning') {
+        // 首页简略显示
+        html = `<div style="font-size: 14px; color: var(--text-dim);">
+          今日已学习 ${learningRecords.length} 个主题：
+          ${learningRecords.slice(0,3).map(r => r.topic).join(' · ')}
+          ${learningRecords.length > 3 ? '...' : ''}
+        </div>`;
+      } else {
+        // 详情页完整显示
+        learningRecords.forEach(record => {
+          html += `
+            <div class="learn-card">
+              <div class="learn-time">${record.time}</div>
+              <div class="learn-topic">${record.topic}</div>
+              <div class="learn-summary">${record.summary}</div>
+              <div class="learn-tags">
+                ${record.tags.map(tag => `<span class="learn-tag">${tag}</span>`).join('')}
+              </div>
+            </div>
+          `;
+        });
+      }
+      
+      container.innerHTML = html;
+    }
+    
+    // 渲染时间线
+    function renderTimeline() {
+      const now = new Date();
+      const nowTime = now.getHours() * 60 + now.getMinutes();
+      const container = document.getElementById('timelineContent');
+      let html = '';
+      
+      taskQueue.forEach(task => {
+        const [h, m] = task.time.split(':');
+        const taskTime = parseInt(h) * 60 + parseInt(m);
+        const isDone = taskTime < nowTime;
+        
+        html += `
+          <div class="timeline-item ${isDone ? 'done' : ''}">
+            <div class="timeline-time">${task.time}</div>
+            <div class="timeline-content">
+              <span style="margin-right: 8px;">${task.emoji}</span>
+              ${task.name}
+              ${isDone ? ' ✓' : ''}
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    // 刷新
+    function refreshAll() {
+      updateTime();
+      // 重置缓存，强制重新拉数据
+      stocksQuoteCache = {};
+      loadHoldingsData().then(() => {
+        renderStocks('heroStocks');
+        renderMarketIndices('marketIndices');
+      });
+      renderLearning('heroLearning');
+      renderTimeline();
+    }
+
+    function refreshStocks() {
+      stocksQuoteCache = {};
+      loadHoldingsData().then(() => {
+        renderStocks('stocksGrid');
+        renderMarketIndices('marketIndices');
+      });
+    }
+
+    function refreshLearning() {
+      renderLearning('learningContent');
+    }
+
+    // === 自动刷新控制器 ===
+    // 频率选项（毫秒），0 = 手动
+    const REFRESH_OPTIONS = [
+      { label: '手动', value: 0 },
+      { label: '10秒', value: 10000 },
+      { label: '30秒', value: 30000 },
+      { label: '1分钟', value: 60000 }
+    ];
+    let refreshInterval = null;
+    let refreshCountdown = 0;
+    let currentRefreshMs = 30000; // 默认 30 秒
+
+    function applyRefreshInterval(ms) {
+      currentRefreshMs = ms;
+      localStorage.setItem('waizai-refresh-ms', String(ms));
+      // 更新按钮 UI
+      document.querySelectorAll('.refresh-freq-btn').forEach(b => {
+        b.classList.toggle('active', Number(b.dataset.ms) === ms);
+      });
+      // 重启定时器
+      if (refreshInterval) clearInterval(refreshInterval);
+      refreshCountdown = Math.floor(ms / 1000);
+      if (ms > 0) {
+        refreshInterval = setInterval(() => {
+          refreshAll();
+          refreshStocks();
+          refreshLearning();
+          refreshCountdown = Math.floor(ms / 1000);
+        }, ms);
+      }
+      updateCountdownUI();
+    }
+
+    function updateCountdownUI() {
+      const el = document.getElementById('refreshCountdown');
+      if (!el) return;
+      if (currentRefreshMs === 0) {
+        el.textContent = '手动';
+      } else {
+        refreshCountdown = Math.max(0, refreshCountdown - 1);
+        if (refreshCountdown === 0) refreshCountdown = Math.floor(currentRefreshMs / 1000);
+        el.textContent = `${refreshCountdown}s`;
+      }
+    }
+
+    function buildRefreshFreqUI() {
+      const bar = document.getElementById('refreshFreqBar');
+      if (!bar) return;
+      bar.innerHTML = REFRESH_OPTIONS.map(o =>
+        `<button class="refresh-freq-btn ${o.value === currentRefreshMs ? 'active' : ''}" data-ms="${o.value}" onclick="applyRefreshInterval(${o.value})">${o.label}</button>`
+      ).join('') + `<span class="refresh-countdown" id="refreshCountdown">${currentRefreshMs === 0 ? '手动' : Math.floor(currentRefreshMs/1000)+'s'}</span>`;
+    }
+
+    // 启动时读取 localStorage
+    const savedMs = Number(localStorage.getItem('waizai-refresh-ms') || 30000);
+    buildRefreshFreqUI();
+    applyRefreshInterval(savedMs);
+    setInterval(updateCountdownUI, 1000);
+    
+    // 简易 markdown 渲染器（够用就好，不引第三方）
+    function renderMarkdown(md) {
+      if (!md) return '';
+      let html = md
+        // 转义 HTML
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      // 代码块 (``` ... ```)
+      html = html.replace(/```([\s\S]*?)```/g, (m, code) => `<pre><code>${code.trim()}</code></pre>`);
+
+      // 行内代码 (`...`)
+      html = html.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+
+      // 标题 (### / ## / #)
+      html = html.replace(/^###\s+(.+)$/gm, '<h3>$1</h3>');
+      html = html.replace(/^##\s+(.+)$/gm, '<h2>$1</h2>');
+      html = html.replace(/^#\s+(.+)$/gm, '<h1>$1</h1>');
+
+      // 引用 (> ...)
+      html = html.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>');
+
+      // 水平线 (---)
+      html = html.replace(/^---+$/gm, '<hr>');
+
+      // 粗体 (**...**) 和 斜体 (*...*)
+      html = html.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+
+      // 表格（简易: | a | b | / | - | - | / | x | y |）
+      html = html.replace(/((?:\|[^\n]+\|\n)+)/g, (block) => {
+        const lines = block.trim().split('\n');
+        if (lines.length < 2 || !/^\|[\s\-:|]+\|$/.test(lines[1])) return block;
+        const headers = lines[0].split('|').slice(1, -1).map(c => c.trim());
+        const rows = lines.slice(2).map(l => l.split('|').slice(1, -1).map(c => c.trim()));
+        let t = '<table><thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
+        for (const r of rows) t += '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>';
+        return t + '</tbody></table>';
+      });
+
+      // 列表 (- 或 * 或 1.)
+      html = html.replace(/^[-*]\s+(.+)$/gm, '<li>$1</li>');
+      html = html.replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>');
+      html = html.replace(/(<li>[^<]+<\/li>\n?)+/g, (m) => `<ul>${m}</ul>`);
+
+      // 段落（剩余的双换行）
+      html = html.split(/\n{2,}/).map(p => {
+        if (/^<(h\d|ul|ol|li|pre|table|blockquote|hr)/.test(p.trim())) return p;
+        const lines = p.split('\n').filter(l => l.trim());
+        if (lines.length === 0) return '';
+        return '<p>' + lines.join('<br>') + '</p>';
+      }).join('\n');
+
+      return html;
+    }
+
+    // 报告数据缓存
+    let reportsIndex = null;
+    let reportsCache = {};
+
+    async function loadReportsIndex() {
+      try {
+        const res = await fetch(`reports/index.json?t=${Date.now()}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        reportsIndex = await res.json();
+        renderReportsList();
+        // 更新 badge
+        const badge = document.getElementById('reportsBadge');
+        if (badge) badge.textContent = `${reportsIndex.total}份`;
+        const sub = document.getElementById('reportsSubtitle');
+        if (sub) sub.textContent = `最近 ${reportsIndex.retain_days} 天 · 共 ${reportsIndex.total} 份 · 同步于 ${reportsIndex.generated_at}`;
+      } catch (e) {
+        document.getElementById('reportsList').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <div class="empty-text">索引加载失败<br><small>${e.message}</small></div>
+          </div>`;
+      }
+    }
+
+    function renderReportsList() {
+      const container = document.getElementById('reportsList');
+      if (!reportsIndex || !reportsIndex.reports || reportsIndex.reports.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <div class="empty-text">还没有报告<br><small>16:00 复盘后会生成</small></div>
+          </div>`;
+        return;
+      }
+      let html = '';
+      reportsIndex.reports.forEach((r, i) => {
+        const sizeKB = (r.size / 1024).toFixed(1);
+        html += `
+          <div class="report-item ${i === 0 ? 'active' : ''}" data-url="${r.url}" data-date="${r.date}" data-title="${r.title}" data-meta="${r.sources}份源 · ${sizeKB}KB · ${r.days_ago}天前" onclick="loadReport(this)">
+            <div class="report-date">${r.date}</div>
+            <div class="report-title">${r.title}</div>
+            <div class="report-meta">${r.sources}份源 · ${sizeKB}KB · ${r.days_ago}天前</div>
+          </div>`;
+      });
+      container.innerHTML = html;
+      // 自动加载第一份
+      if (reportsIndex.reports.length > 0) {
+        loadReport(container.querySelector('.report-item'));
+      }
+    }
+
+    async function loadReport(el) {
+      // 高亮
+      document.querySelectorAll('.report-item').forEach(i => i.classList.remove('active'));
+      el.classList.add('active');
+
+      const url = el.dataset.url;
+      const date = el.dataset.date;
+      const title = el.dataset.title;
+      const meta = el.dataset.meta;
+
+      document.getElementById('reportsDetailTitle').textContent = `📋 ${title}`;
+      document.getElementById('reportsDetailMeta').textContent = `${date} · ${meta}`;
+      const contentDiv = document.getElementById('reportsDetailContent');
+      contentDiv.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-dim);">加载中...</div>';
+
+      try {
+        let md;
+        if (reportsCache[url]) {
+          md = reportsCache[url];
+        } else {
+          const res = await fetch(url + `?t=${Date.now()}`);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          md = await res.text();
+          reportsCache[url] = md;
+        }
+        contentDiv.innerHTML = `<div class="md-body">${renderMarkdown(md)}</div>`;
+        contentDiv.scrollTop = 0;
+      } catch (e) {
+        contentDiv.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <div class="empty-text">报告加载失败<br><small>${e.message}</small></div>
+          </div>`;
+      }
+    }
+
+    function refreshReports() {
+      reportsIndex = null;
+      reportsCache = {};
+      loadReportsIndex();
+    }
+
+    // 初始化
+    loadHoldingsData().then(() => {
+      renderStocks('heroStocks');
+      renderStocks('stocksGrid');
+      renderMarketIndices('marketIndices');
+    });
+    renderLearning('heroLearning');
+    renderLearning('learningContent');
+    loadMethodologyData();
+    renderTimeline();
+    updateTime();
+    loadReportsIndex();
+    setInterval(updateTime, 1000);
+
+    // 注册 Service Worker (PWA)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(reg => console.log('[PWA] Service Worker 已注册:', reg.scope))
+          .catch(err => console.warn('[PWA] SW 注册失败:', err));
+      });
+    }
+  </script>
+
+  <!-- Skills 详情弹窗 -->
+  <div id="skillModal" class="modal" style="display:none">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title" id="skillModalTitle">技能详情</span>
+        <button class="modal-close" onclick="closeSkillModal()">×</button>
+      </div>
+      <div class="modal-body" id="skillModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Toast 容器 -->
+  <div id="toastContainer" style="position:fixed;top:20px;right:20px;z-index:9999"></div>
+
+  <script>
+    // 弹窗函数（供 app.js 调用）
+    function openSkillModal(skill) {
+      const m = $('#skillModal');
+      $('#skillModalTitle').textContent = skill.name;
+      const desc = skill.description || '暂无描述';
+      const version = skill.version || '?';
+      const source = skill.source || 'local';
+      const path = skill.path || '';
+      $('#skillModalBody').innerHTML = `
+        <div class="skill-detail">
+          <div class="skill-detail-row"><span class="label">版本</span><span class="value">${version}</span></div>
+          <div class="skill-detail-row"><span class="label">来源</span><span class="value">${source}</span></div>
+          <div class="skill-detail-row"><span class="label">路径</span><span class="value" style="font-size:10px;word-break:break-all">${path}</span></div>
+          <div class="skill-detail-desc">${desc}</div>
+        </div>
+      `;
+      m.style.display = 'flex';
+    }
+    function closeSkillModal() {
+      $('#skillModal').style.display = 'none';
+    }
+    // 点击遮罩关闭
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('modal-backdrop')) closeSkillModal();
+    });
+  </script>
+</body>
+</html>
