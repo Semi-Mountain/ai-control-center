@@ -1,0 +1,39 @@
+{
+  "date": "2026-09-23",
+  "generated_at": "2026-09-23 01:00 北京时间",
+  "source": "01:00 cron 学习任务",
+  "theme": "Agent 自我进化 · RSI 三层结构",
+  "papers": [
+    {
+      "tag": "RSI",
+      "title": "Meta^N",
+      "url": "https://arxiv.org/abs/2608.24735",
+      "takeaway": "不变操作 Ω + 递归输入 → ARC-AGI-2 唯一过零分；自进化不再自毁"
+    },
+    {
+      "tag": "Harness",
+      "title": "RRSI",
+      "url": "https://arxiv.org/abs/2609.24972",
+      "takeaway": "时间退火 proposer + critic/pruner → harness RSI 不再 OOD 过拟合"
+    },
+    {
+      "tag": "Dream",
+      "title": "Dream-RSI",
+      "url": "https://arxiv.org/abs/2609.14858",
+      "takeaway": "历史发现做 replay simulator → 离线评估探索策略（212p 热门）"
+    }
+  ],
+  "actions": [
+    "声明「不变层 Ω」（#008）：与爸爸的契约 / 系统骨架 / 元规则永远不改，可变层可递归",
+    "建立 trace 留底 + replay 机制（#009）：每次输出留底，周六复盘重放",
+    "改进日志用「可复用快捷树」结构（DENSE 思路）：触发条件 → 复用模式 → 出处"
+  ],
+  "rsi_metrics": {
+    "in_distribution_gain": 14.1,
+    "out_of_distribution_gain": 4.7,
+    "immutable_layer_declared": true,
+    "replay_buffer_ready": false,
+    "three_layer_focus": "Harness 级"
+  },
+  "related_improvements": ["#008", "#009"]
+}

@@ -772,6 +772,17 @@
           </div>
         </div>
 
+        <!-- 今晚学到的（01:00 cron 自动更新，#007 / #008 / #009） -->
+        <div class="card" style="border-left: 3px solid #4CB782;">
+          <div class="card-header">
+            <span class="card-title">🌙 今晚学到的</span>
+            <span class="card-subtitle" id="tonightTimestamp">--</span>
+          </div>
+          <div id="tonightLearned">
+            <div style="padding: 12px 16px; color: #888; font-size: 12px;">加载中...</div>
+          </div>
+        </div>
+
         <!-- 今日方法论 -->
         <div class="card" style="margin-top: 16px;">
           <div class="card-header">
@@ -1513,7 +1524,56 @@
       
       container.innerHTML = html;
     }
-    
+
+    // 渲染「今晚学到的」卡片（#007 / #008 / #009，每晚 01:00 cron 更新）
+    async function renderTonightLearned() {
+      const container = document.getElementById('tonightLearned');
+      const tsEl = document.getElementById('tonightTimestamp');
+      if (!container) return;
+      try {
+        const r = await fetch('./data/tonight_learned.json?t=' + Date.now());
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const data = await r.json();
+        if (tsEl) tsEl.textContent = data.date + ' · ' + (data.theme || '');
+        const papers = data.papers || [];
+        const actions = data.actions || [];
+        const m = data.rsi_metrics || {};
+        const im = m.immutable_layer_declared ? '✅' : '⏳';
+        const rb = m.replay_buffer_ready ? '✅' : '⏳';
+        const papersHtml = papers.map(p => `
+          <div style="margin-bottom: 8px; padding: 8px 10px; background: rgba(94,106,210,0.06); border-radius: 4px; border-left: 2px solid #5E6AD2;">
+            <div style="display: flex; align-items: baseline; gap: 6px; margin-bottom: 3px;">
+              <span style="font-size: 10px; padding: 1px 5px; background: rgba(94,106,210,0.2); border-radius: 3px; color: #5E6AD2;">${p.tag}</span>
+              <strong style="font-size: 12px; color: #fff;"><a href="${p.url}" target="_blank" style="color: inherit; text-decoration: none;">${p.title}</a></strong>
+            </div>
+            <div style="font-size: 11px; color: #aaa; line-height: 1.5;">${p.takeaway}</div>
+          </div>
+        `).join('');
+        const actionsHtml = actions.map((a, i) => `<li style="margin-bottom: 3px; color: #ccc; font-size: 11px;">→ ${a}</li>`).join('');
+        container.innerHTML = `
+          <div style="padding: 12px 16px;">
+            <div style="margin-bottom: 10px;">
+              <strong style="font-size: 12px; color: #5E6AD2;">📄 核心论文</strong>
+              <div style="margin-top: 6px;">${papersHtml || '<div style="color: #888; font-size: 11px;">暂无</div>'}</div>
+            </div>
+            <div style="margin-bottom: 10px;">
+              <strong style="font-size: 12px; color: #4CB782;">⚡ 改进动作</strong>
+              <ul style="margin: 6px 0 0; padding-left: 18px;">${actionsHtml}</ul>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font-size: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">
+              <div style="padding: 4px 6px; background: rgba(94,106,210,0.08); border-radius: 3px;"><div style="color: #888;">In-Dist</div><div style="font-size: 13px; font-weight: 600; color: #5E6AD2;">+${m.in_distribution_gain ?? '—'}</div></div>
+              <div style="padding: 4px 6px; background: rgba(76,183,130,0.08); border-radius: 3px;"><div style="color: #888;">OOD</div><div style="font-size: 13px; font-weight: 600; color: #4CB782;">+${m.out_of_distribution_gain ?? '—'}</div></div>
+              <div style="padding: 4px 6px; background: rgba(255,255,255,0.04); border-radius: 3px;"><div style="color: #888;">不变层</div><div style="font-size: 12px; color: #fff;">${im} #008</div></div>
+              <div style="padding: 4px 6px; background: rgba(255,255,255,0.04); border-radius: 3px;"><div style="color: #888;">Replay</div><div style="font-size: 12px; color: #fff;">${rb} #009</div></div>
+            </div>
+            <div style="margin-top: 8px; font-size: 10px; color: #666;">三层结构聚焦：<strong style="color: #fff;">${m.three_layer_focus || '—'}</strong></div>
+          </div>
+        `;
+      } catch (e) {
+        container.innerHTML = `<div style="padding: 12px 16px; color: #888; font-size: 11px;">加载失败：${e.message}</div>`;
+      }
+    }
+
     // 渲染时间线
     function renderTimeline() {
       const now = new Date();
@@ -1551,6 +1611,7 @@
         renderMarketIndices('marketIndices');
       });
       renderLearning('heroLearning');
+      renderTonightLearned();
       renderTimeline();
     }
 
@@ -1780,6 +1841,7 @@
       renderMarketIndices('marketIndices');
     });
     renderLearning('heroLearning');
+    renderTonightLearned();
     renderLearning('learningContent');
     loadMethodologyData();
     renderTimeline();
