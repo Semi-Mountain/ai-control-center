@@ -1,0 +1,9 @@
+{
+  "holdings": [
+    { "code": "000001", "name": "上证指数", "last": 3950, "change_pct": 0.5, "pnl_pct": 0, "pnl": 0, "market_value": 0, "high": 3960, "low": 3920, "open": 3930, "volume": 500000000 },
+    { "code": "399001", "name": "深证成指", "last": 13730, "change_pct": 0.65, "pnl_pct": 0, "pnl": 0, "market_value": 0, "high": 13800, "low": 13650, "open": 13680, "volume": 193000000 },
+    { "code": "000300", "name": "沪深300", "last": 4540, "change_pct": 0.71, "pnl_pct": 0, "pnl": 0, "market_value": 0, "high": 4550, "low": 4510, "open": 4520, "volume": 186000000 },
+    { "code": "399006", "name": "创业板指", "last": 3400, "change_pct": 0.80, "pnl_pct": 0, "pnl": 0, "market_value": 0, "high": 3420, "low": 3370, "open": 3380, "volume": 27700000 },
+    { "code": "000688", "name": "科创50", "last": 1657, "change_pct": 0.29, "pnl_pct": 0, "pnl": 0, "market_value": 0, "high": 1665, "low": 1645, "open": 1650, "volume": 7600000 }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "date": "2026-09-22",
+  "topic": "A股数据源架构设计",
+  "methodology": [
+    { "category": "架构", "content": "5层fallback: akshare → tencent → mx → baostock → tushare" },
+    { "category": "实测", "content": "腾讯API最稳定（免token），Tushare次之，MX需要有效key" }
+  ],
+  "knowledge": [
+    { "category": "数据源", "point": "腾讯财经API：qt.gtimg.cn/q=sz000988" },
+    { "category": "数据源", "point": "Tushare需要token认证" },
+    { "category": "部署", "point": "GitHub Pages静态托管最佳" }
+  ]
+}
