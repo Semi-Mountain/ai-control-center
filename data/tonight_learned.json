@@ -1,39 +1,50 @@
 {
-  "date": "2026-09-23",
-  "generated_at": "2026-09-23 01:00 北京时间",
+  "date": "2026-09-24",
+  "generated_at": "2026-09-24 01:00 北京时间",
   "source": "01:00 cron 学习任务",
-  "theme": "Agent 自我进化 · RSI 三层结构",
+  "theme": "让 AI 更聪明 · 方法论深化（推理时计算 / over-refusal 机制 / hosted LLM 可重复性）",
   "papers": [
     {
-      "tag": "RSI",
-      "title": "Meta^N",
-      "url": "https://arxiv.org/abs/2608.24735",
-      "takeaway": "不变操作 Ω + 递归输入 → ARC-AGI-2 唯一过零分；自进化不再自毁"
+      "tag": "OPD",
+      "title": "Prompt Breadth × Rollout Refresh",
+      "url": "https://arxiv.org/abs/2609.25048",
+      "takeaway": "8 prompts × 10 policy snapshots ≈ 14,080 prompts 的 98% 效果 — policy 演化是被低估的杠杆"
     },
     {
-      "tag": "Harness",
-      "title": "RRSI",
-      "url": "https://arxiv.org/abs/2609.24972",
-      "takeaway": "时间退火 proposer + critic/pruner → harness RSI 不再 OOD 过拟合"
+      "tag": "Safety",
+      "title": "Over-Refusal / Hypersensitive Heads",
+      "url": "https://arxiv.org/abs/2609.25049",
+      "takeaway": "过度拒绝是稀疏注意力头级别的可定位 bug — surface 危险 ≠ intent 危险，先拆再答"
     },
     {
-      "tag": "Dream",
-      "title": "Dream-RSI",
-      "url": "https://arxiv.org/abs/2609.14858",
-      "takeaway": "历史发现做 replay simulator → 离线评估探索策略（212p 热门）"
+      "tag": "Eval",
+      "title": "Hosted LLM Reproducibility",
+      "url": "https://arxiv.org/abs/2609.22478",
+      "takeaway": "Hosted LLM 不是稳定测量仪器 — 任何数字必须标「取数时 + ±漂移」"
+    },
+    {
+      "tag": "Gödel",
+      "title": "Gödel Agent",
+      "url": "https://arxiv.org/abs/2410.04444",
+      "takeaway": "显式自指框架（81p HN）— 自进化的四象限已成熟，wowzai 处于「约束+缓存」象限"
     }
   ],
   "actions": [
-    "声明「不变层 Ω」（#008）：与爸爸的契约 / 系统骨架 / 元规则永远不改，可变层可递归",
-    "建立 trace 留底 + replay 机制（#009）：每次输出留底，周六复盘重放",
-    "改进日志用「可复用快捷树」结构（DENSE 思路）：触发条件 → 复用模式 → 出处"
+    "新增「数字声明规范」（#011）：任何数字必须带 {{源, 取数时, ±漂移}}，落地今晚长报告",
+    "新增「surface vs intent 拆分」（#011）：形式危险但意图安全 → 写明'触发了 XX 但 intent 是 Y，答 Z'",
+    "为 #007（难度 4 长版）报告模板自动加这两段前置检查"
   ],
   "rsi_metrics": {
-    "in_distribution_gain": 14.1,
-    "out_of_distribution_gain": 4.7,
+    "in_distribution_gain": 24.09,
+    "out_of_distribution_gain": "policy-iteration",
     "immutable_layer_declared": true,
     "replay_buffer_ready": false,
-    "three_layer_focus": "Harness 级"
+    "three_layer_focus": "方法论（policy + surface/intent + 数字漂移）"
   },
-  "related_improvements": ["#008", "#009"]
+  "related_improvements": [
+    "#006",
+    "#007",
+    "#008",
+    "#011"
+  ]
 }
