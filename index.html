@@ -1335,32 +1335,52 @@
         const [hr, mr, qr] = await Promise.all([
           fetch('./data/holdings.json?t=' + Date.now()).then(r => r.ok ? r.json() : []),
           fetch('./data/holdings_map.json?t=' + Date.now()).then(r => r.ok ? r.json() : {}),
-          fetch('./data/market.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null)
+          fetch('./data/quotes.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null)
         ]);
         // 持仓基本信息（成本/股数/代码）
         holdingsData = Array.isArray(hr) ? hr : [];
         // 主题/板块映射
         holdingsMap = (mr && mr.holdings) ? mr.holdings : {};
-        // 大盘指数 + 实时行情
-        marketData = qr;
-        // 把行情缓存起来（key = code）
-        if (qr && Array.isArray(qr.holdings)) {
-          stocksQuoteCache = {};
-          qr.holdings.forEach(h => {
-            stocksQuoteCache[h.code] = {
-              price: h.last,
-              change_pct: h.change_pct,
-              change_str: (h.change_pct > 0 ? '+' : '') + h.change_pct.toFixed(2) + '%',
-              pnl_pct: h.pnl_pct,
-              pnl: h.pnl,
-              market_value: h.market_value,
-              high: h.high,
-              low: h.low,
-              open: h.open,
-              volume: h.volume,
-              name: h.name
-            };
+        
+        // 大盘指数 + 实时行情 - 从 quotes.json 提取
+        if (qr && qr.symbols) {
+          const symbols = qr.symbols;
+          // 构建大盘指数 (indices)
+          const indices = {};
+          const indexCodes = ['000001', '399001', '000300', '399006', '000688', '000852', '399905'];
+          indexCodes.forEach(code => {
+            if (symbols[code]) {
+              const s = symbols[code];
+              indices[s.name] = {
+                value: s.price || s.close,
+                change_pct: s.change_pct || s.chgPct || 0
+              };
+            }
           });
+          marketData = { indices };
+          
+          // 把持仓股票行情缓存起来（key = code）
+          stocksQuoteCache = {};
+          holdingsData.forEach(stock => {
+            if (symbols[stock.code]) {
+              const s = symbols[stock.code];
+              const changePct = s.change_pct || s.change_pct || 0;
+              stocksQuoteCache[stock.code] = {
+                price: s.close,
+                change_pct: changePct,
+                change_str: (changePct > 0 ? '+' : '') + changePct.toFixed(2) + '%',
+                high: s.high,
+                low: s.low,
+                open: s.open,
+                volume: s.volume,
+                name: s.name,
+                prev_close: s.prev_close
+              };
+            }
+          });
+        } else {
+          marketData = null;
+          stocksQuoteCache = {};
         }
         return true;
       } catch (e) {
@@ -1387,20 +1407,15 @@
         const changeStr = q.change_str || '加载中';
         const changeClass = changePct === null ? '' : (changePct > 0 ? 'up' : (changePct < 0 ? 'down' : ''));
         const map = holdingsMap[stock.code] || {};
-        // 盈亏计算（如果有行情）
-        const pnlPct = q.pnl_pct !== undefined ? q.pnl_pct : null;
-        const pnlClass = pnlPct === null ? '' : (pnlPct > 0 ? 'up' : (pnlPct < 0 ? 'down' : ''));
-        const pnlStr = pnlPct === null ? '' : `盈亏 ${pnlPct > 0 ? '+' : ''}${pnlPct.toFixed(1)}%`;
         html += `
           <div class="stock-card">
             <div class="stock-name">${stock.name || q.name || stock.code}</div>
-            <div class="stock-code">${stock.code} · ${stock.shares}股</div>
-            <div class="stock-theme">${map.primary || stock.group || ''}</div>
+            <div class="stock-code">${stock.code}</div>
+            <div class="stock-theme">${map.theme || stock.group || ''}</div>
             <div class="stock-price-row">
               <span class="stock-price">${price}</span>
               <span class="stock-change ${changeClass}">${changeStr}</span>
             </div>
-            ${stock.cost ? `<div class="stock-cost ${pnlClass}">成本 ${stock.cost.toFixed(2)} · ${pnlStr}</div>` : ''}
           </div>
         `;
       });
