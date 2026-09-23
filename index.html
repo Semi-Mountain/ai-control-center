@@ -1243,16 +1243,8 @@
       { time: '07:00', name: '辩论讨论', emoji: '⚖️' }
     ];
     
-    // 学习记录（静态演示）
-    const learningRecords = [
-      { time: '06:00', topic: '全球宏观', summary: '学习全球宏观经济趋势，了解地缘政治对市场的影响', tags: ['宏观', '地缘政治'] },
-      { time: '05:00', topic: '先进制造', summary: '研究机器人产业链，七腾机器人概念股分析', tags: ['机器人', '智能制造'] },
-      { time: '04:00', topic: '数学+物理', summary: '巩固数学基础，概率论与数理统计复习', tags: ['数学', '概率论'] },
-      { time: '03:00', topic: 'A股+量化', summary: '学习量化策略，了解多因子模型应用', tags: ['量化', '因子模型'] },
-      { time: '02:00', topic: '金融市场', summary: '分析金融市场运行规律，货币政策影响', tags: ['金融', '货币'] },
-      { time: '01:00', topic: 'AI大模型', summary: '学习最新AI前沿论文，Transformer改进方向', tags: ['AI', '大模型'] },
-      { time: '00:00', topic: 'AI前沿+算力', summary: '学习华为昇腾产业链，算力基础设施建设', tags: ['昇腾', '算力'] }
-    ];
+    // 学习记录 - 从JSON动态加载
+    let learningRecords = [];
     
     // 页面导航
     document.querySelectorAll('.nav-item').forEach(item => {
@@ -1750,12 +1742,24 @@
         const res = await fetch(`reports/index.json?t=${Date.now()}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         reportsIndex = await res.json();
+        
+        // 构建学习记录从learningReports
+        if (reportsIndex.learningReports) {
+          learningRecords = reportsIndex.learningReports.map(r => ({
+            time: r.time,
+            topic: r.jobName, // 辩论/总结
+            summary: r.filename,
+            tags: [r.date]
+          })).reverse();
+        }
+        
         renderReportsList();
         // 更新 badge
+        const total = (reportsIndex.learningReports?.length || 0) + (reportsIndex.marketReports?.length || 0);
         const badge = document.getElementById('reportsBadge');
-        if (badge) badge.textContent = `${reportsIndex.total}份`;
+        if (badge) badge.textContent = `${total}份`;
         const sub = document.getElementById('reportsSubtitle');
-        if (sub) sub.textContent = `最近 ${reportsIndex.retain_days} 天 · 共 ${reportsIndex.total} 份 · 同步于 ${reportsIndex.generated_at}`;
+        if (sub) sub.textContent = `学习报告 ${reportsIndex.learningReports?.length || 0} 份 · 行情报告 ${reportsIndex.marketReports?.length || 0} 份 · 同步于 ${reportsIndex.updateTime || '未知'}`;
       } catch (e) {
         document.getElementById('reportsList').innerHTML = `
           <div class="empty-state">
@@ -1767,7 +1771,9 @@
 
     function renderReportsList() {
       const container = document.getElementById('reportsList');
-      if (!reportsIndex || !reportsIndex.reports || reportsIndex.reports.length === 0) {
+      const learningReports = reportsIndex?.learningReports || [];
+      const marketReports = reportsIndex?.marketReports || [];
+      if (!reportsIndex || (learningReports.length === 0 && marketReports.length === 0)) {
         container.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">📋</div>
@@ -1775,19 +1781,35 @@
           </div>`;
         return;
       }
+      
+      // 合并学习报告和行情报告
+      const allReports = [
+        ...(reportsIndex.learningReports || []).map(r => ({...r, type: '学习报告'})),
+        ...(reportsIndex.marketReports || []).map(r => ({...r, type: '行情报告'}))
+      ].sort((a, b) => {
+        // 按日期和时间排序，最新的在前
+        const dateA = new Date(a.date + ' ' + a.time);
+        const dateB = new Date(b.date + ' ' + b.time);
+        return dateB - dateA;
+      });
+      
       let html = '';
-      reportsIndex.reports.forEach((r, i) => {
-        const sizeKB = (r.size / 1024).toFixed(1);
+      allReports.forEach((r, i) => {
         html += `
-          <div class="report-item ${i === 0 ? 'active' : ''}" data-url="${r.url}" data-date="${r.date}" data-title="${r.title}" data-meta="${r.sources}份源 · ${sizeKB}KB · ${r.days_ago}天前" onclick="loadReport(this)">
-            <div class="report-date">${r.date}</div>
-            <div class="report-title">${r.title}</div>
-            <div class="report-meta">${r.sources}份源 · ${sizeKB}KB · ${r.days_ago}天前</div>
+          <div class="report-item ${i === 0 ? 'active' : ''}" 
+               data-url="reports/${r.date}/${r.filename}" 
+               data-date="${r.date}" 
+               data-title="${r.jobName}" 
+               data-meta="${r.time} · ${r.type}"
+               onclick="loadReport(this)">
+            <div class="report-date">${r.date} ${r.time}</div>
+            <div class="report-title">${r.jobName}</div>
+            <div class="report-meta">${r.type}</div>
           </div>`;
       });
       container.innerHTML = html;
       // 自动加载第一份
-      if (reportsIndex.reports.length > 0) {
+      if (allReports.length > 0) {
         loadReport(container.querySelector('.report-item'));
       }
     }
