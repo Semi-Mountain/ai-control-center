@@ -772,6 +772,17 @@
           </div>
         </div>
 
+        <!-- 今晚学到的（01:00 cron 自动更新，#007 / #008 / #009） -->
+        <div class="card" style="border-left: 3px solid #4CB782;">
+          <div class="card-header">
+            <span class="card-title">🌙 今晚学到的</span>
+            <span class="card-subtitle" id="tonightTimestamp">--</span>
+          </div>
+          <div id="tonightLearned">
+            <div style="padding: 12px 16px; color: #888; font-size: 12px;">加载中...</div>
+          </div>
+        </div>
+
         <!-- 今日方法论 -->
         <div class="card" style="margin-top: 16px;">
           <div class="card-header">
@@ -1232,16 +1243,8 @@
       { time: '07:00', name: '辩论讨论', emoji: '⚖️' }
     ];
     
-    // 学习记录（静态演示）
-    const learningRecords = [
-      { time: '06:00', topic: '全球宏观', summary: '学习全球宏观经济趋势，了解地缘政治对市场的影响', tags: ['宏观', '地缘政治'] },
-      { time: '05:00', topic: '先进制造', summary: '研究机器人产业链，七腾机器人概念股分析', tags: ['机器人', '智能制造'] },
-      { time: '04:00', topic: '数学+物理', summary: '巩固数学基础，概率论与数理统计复习', tags: ['数学', '概率论'] },
-      { time: '03:00', topic: 'A股+量化', summary: '学习量化策略，了解多因子模型应用', tags: ['量化', '因子模型'] },
-      { time: '02:00', topic: '金融市场', summary: '分析金融市场运行规律，货币政策影响', tags: ['金融', '货币'] },
-      { time: '01:00', topic: 'AI大模型', summary: '学习最新AI前沿论文，Transformer改进方向', tags: ['AI', '大模型'] },
-      { time: '00:00', topic: 'AI前沿+算力', summary: '学习华为昇腾产业链，算力基础设施建设', tags: ['昇腾', '算力'] }
-    ];
+    // 学习记录 - 从JSON动态加载
+    let learningRecords = [];
     
     // 页面导航
     document.querySelectorAll('.nav-item').forEach(item => {
@@ -1330,34 +1333,54 @@
     async function loadHoldingsData() {
       try {
         const [hr, mr, qr] = await Promise.all([
-          fetch('./data/holdings.json?t=' + Date.now()).then(r => r.ok ? r.json() : []),
-          fetch('./data/holdings_map.json?t=' + Date.now()).then(r => r.ok ? r.json() : {}),
-          fetch('./data/market.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null)
+          fetch('https://raw.githubusercontent.com/Semi-Mountain/ai-control-center/gh-pages/public/data/holdings.json?t=' + Date.now()).then(r => r.ok ? r.json() : []),
+          fetch('https://raw.githubusercontent.com/Semi-Mountain/ai-control-center/gh-pages/public/data/holdings_map.json?t=' + Date.now()).then(r => r.ok ? r.json() : {}),
+          fetch('https://raw.githubusercontent.com/Semi-Mountain/ai-control-center/gh-pages/public/data/quotes.json?t=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null)
         ]);
         // 持仓基本信息（成本/股数/代码）
         holdingsData = Array.isArray(hr) ? hr : [];
         // 主题/板块映射
         holdingsMap = (mr && mr.holdings) ? mr.holdings : {};
-        // 大盘指数 + 实时行情
-        marketData = qr;
-        // 把行情缓存起来（key = code）
-        if (qr && Array.isArray(qr.holdings)) {
-          stocksQuoteCache = {};
-          qr.holdings.forEach(h => {
-            stocksQuoteCache[h.code] = {
-              price: h.last,
-              change_pct: h.change_pct,
-              change_str: (h.change_pct > 0 ? '+' : '') + h.change_pct.toFixed(2) + '%',
-              pnl_pct: h.pnl_pct,
-              pnl: h.pnl,
-              market_value: h.market_value,
-              high: h.high,
-              low: h.low,
-              open: h.open,
-              volume: h.volume,
-              name: h.name
-            };
+        
+        // 大盘指数 + 实时行情 - 从 quotes.json 提取
+        if (qr && qr.symbols) {
+          const symbols = qr.symbols;
+          // 构建大盘指数 (indices)
+          const indices = {};
+          const indexCodes = ['000001', '399001', '000300', '399006', '000688', '000852', '399905'];
+          indexCodes.forEach(code => {
+            if (symbols[code]) {
+              const s = symbols[code];
+              indices[s.name] = {
+                value: s.price || s.close,
+                change_pct: s.change_pct || s.chgPct || 0
+              };
+            }
           });
+          marketData = { indices };
+          
+          // 把持仓股票行情缓存起来（key = code）
+          stocksQuoteCache = {};
+          holdingsData.forEach(stock => {
+            if (symbols[stock.code]) {
+              const s = symbols[stock.code];
+              const changePct = s.change_pct || s.change_pct || 0;
+              stocksQuoteCache[stock.code] = {
+                price: s.close,
+                change_pct: changePct,
+                change_str: (changePct > 0 ? '+' : '') + changePct.toFixed(2) + '%',
+                high: s.high,
+                low: s.low,
+                open: s.open,
+                volume: s.volume,
+                name: s.name,
+                prev_close: s.prev_close
+              };
+            }
+          });
+        } else {
+          marketData = null;
+          stocksQuoteCache = {};
         }
         return true;
       } catch (e) {
@@ -1384,20 +1407,15 @@
         const changeStr = q.change_str || '加载中';
         const changeClass = changePct === null ? '' : (changePct > 0 ? 'up' : (changePct < 0 ? 'down' : ''));
         const map = holdingsMap[stock.code] || {};
-        // 盈亏计算（如果有行情）
-        const pnlPct = q.pnl_pct !== undefined ? q.pnl_pct : null;
-        const pnlClass = pnlPct === null ? '' : (pnlPct > 0 ? 'up' : (pnlPct < 0 ? 'down' : ''));
-        const pnlStr = pnlPct === null ? '' : `盈亏 ${pnlPct > 0 ? '+' : ''}${pnlPct.toFixed(1)}%`;
         html += `
           <div class="stock-card">
             <div class="stock-name">${stock.name || q.name || stock.code}</div>
-            <div class="stock-code">${stock.code} · ${stock.shares}股</div>
-            <div class="stock-theme">${map.primary || stock.group || ''}</div>
+            <div class="stock-code">${stock.code}</div>
+            <div class="stock-theme">${map.theme || stock.group || ''}</div>
             <div class="stock-price-row">
               <span class="stock-price">${price}</span>
               <span class="stock-change ${changeClass}">${changeStr}</span>
             </div>
-            ${stock.cost ? `<div class="stock-cost ${pnlClass}">成本 ${stock.cost.toFixed(2)} · ${pnlStr}</div>` : ''}
           </div>
         `;
       });
@@ -1434,7 +1452,7 @@
     let methodologyData = null;
     async function loadMethodologyData() {
       try {
-        const r = await fetch('./data/methodology_today.json?t=' + Date.now());
+        const r = await fetch('https://raw.githubusercontent.com/Semi-Mountain/ai-control-center/gh-pages/public/data/methodology_today.json?t=' + Date.now());
         if (r.ok) {
           methodologyData = await r.json();
           renderHeroMethodology();
@@ -1513,7 +1531,56 @@
       
       container.innerHTML = html;
     }
-    
+
+    // 渲染「今晚学到的」卡片（#007 / #008 / #009，每晚 01:00 cron 更新）
+    async function renderTonightLearned() {
+      const container = document.getElementById('tonightLearned');
+      const tsEl = document.getElementById('tonightTimestamp');
+      if (!container) return;
+      try {
+        const r = await fetch('https://raw.githubusercontent.com/Semi-Mountain/ai-control-center/gh-pages/public/data/tonight_learned.json?t=' + Date.now());
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const data = await r.json();
+        if (tsEl) tsEl.textContent = data.date + ' · ' + (data.theme || '');
+        const papers = data.papers || [];
+        const actions = data.actions || [];
+        const m = data.rsi_metrics || {};
+        const im = m.immutable_layer_declared ? '✅' : '⏳';
+        const rb = m.replay_buffer_ready ? '✅' : '⏳';
+        const papersHtml = papers.map(p => `
+          <div style="margin-bottom: 8px; padding: 8px 10px; background: rgba(94,106,210,0.06); border-radius: 4px; border-left: 2px solid #5E6AD2;">
+            <div style="display: flex; align-items: baseline; gap: 6px; margin-bottom: 3px;">
+              <span style="font-size: 10px; padding: 1px 5px; background: rgba(94,106,210,0.2); border-radius: 3px; color: #5E6AD2;">${p.tag}</span>
+              <strong style="font-size: 12px; color: #fff;"><a href="${p.url}" target="_blank" style="color: inherit; text-decoration: none;">${p.title}</a></strong>
+            </div>
+            <div style="font-size: 11px; color: #aaa; line-height: 1.5;">${p.takeaway}</div>
+          </div>
+        `).join('');
+        const actionsHtml = actions.map((a, i) => `<li style="margin-bottom: 3px; color: #ccc; font-size: 11px;">→ ${a}</li>`).join('');
+        container.innerHTML = `
+          <div style="padding: 12px 16px;">
+            <div style="margin-bottom: 10px;">
+              <strong style="font-size: 12px; color: #5E6AD2;">📄 核心论文</strong>
+              <div style="margin-top: 6px;">${papersHtml || '<div style="color: #888; font-size: 11px;">暂无</div>'}</div>
+            </div>
+            <div style="margin-bottom: 10px;">
+              <strong style="font-size: 12px; color: #4CB782;">⚡ 改进动作</strong>
+              <ul style="margin: 6px 0 0; padding-left: 18px;">${actionsHtml}</ul>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; font-size: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">
+              <div style="padding: 4px 6px; background: rgba(94,106,210,0.08); border-radius: 3px;"><div style="color: #888;">In-Dist</div><div style="font-size: 13px; font-weight: 600; color: #5E6AD2;">+${m.in_distribution_gain ?? '—'}</div></div>
+              <div style="padding: 4px 6px; background: rgba(76,183,130,0.08); border-radius: 3px;"><div style="color: #888;">OOD</div><div style="font-size: 13px; font-weight: 600; color: #4CB782;">+${m.out_of_distribution_gain ?? '—'}</div></div>
+              <div style="padding: 4px 6px; background: rgba(255,255,255,0.04); border-radius: 3px;"><div style="color: #888;">不变层</div><div style="font-size: 12px; color: #fff;">${im} #008</div></div>
+              <div style="padding: 4px 6px; background: rgba(255,255,255,0.04); border-radius: 3px;"><div style="color: #888;">Replay</div><div style="font-size: 12px; color: #fff;">${rb} #009</div></div>
+            </div>
+            <div style="margin-top: 8px; font-size: 10px; color: #666;">三层结构聚焦：<strong style="color: #fff;">${m.three_layer_focus || '—'}</strong></div>
+          </div>
+        `;
+      } catch (e) {
+        container.innerHTML = `<div style="padding: 12px 16px; color: #888; font-size: 11px;">加载失败：${e.message}</div>`;
+      }
+    }
+
     // 渲染时间线
     function renderTimeline() {
       const now = new Date();
@@ -1551,6 +1618,7 @@
         renderMarketIndices('marketIndices');
       });
       renderLearning('heroLearning');
+      renderTonightLearned();
       renderTimeline();
     }
 
@@ -1686,15 +1754,28 @@
 
     async function loadReportsIndex() {
       try {
-        const res = await fetch(`reports/index.json?t=${Date.now()}`);
+        // 绕过 GitHub Pages CDN，直接从 GitHub API 获取最新数据
+        const res = await fetch(`https://raw.githubusercontent.com/Semi-Mountain/ai-control-center/gh-pages/public/reports/index.json?t=${Date.now()}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         reportsIndex = await res.json();
+        
+        // 构建学习记录从learningReports
+        if (reportsIndex.learningReports) {
+          learningRecords = reportsIndex.learningReports.map(r => ({
+            time: r.time,
+            topic: r.jobName, // 辩论/总结
+            summary: r.filename,
+            tags: [r.date]
+          })).reverse();
+        }
+        
         renderReportsList();
         // 更新 badge
+        const total = (reportsIndex.learningReports?.length || 0) + (reportsIndex.marketReports?.length || 0);
         const badge = document.getElementById('reportsBadge');
-        if (badge) badge.textContent = `${reportsIndex.total}份`;
+        if (badge) badge.textContent = `${total}份`;
         const sub = document.getElementById('reportsSubtitle');
-        if (sub) sub.textContent = `最近 ${reportsIndex.retain_days} 天 · 共 ${reportsIndex.total} 份 · 同步于 ${reportsIndex.generated_at}`;
+        if (sub) sub.textContent = `学习报告 ${reportsIndex.learningReports?.length || 0} 份 · 行情报告 ${reportsIndex.marketReports?.length || 0} 份 · 同步于 ${reportsIndex.updateTime || '未知'}`;
       } catch (e) {
         document.getElementById('reportsList').innerHTML = `
           <div class="empty-state">
@@ -1706,7 +1787,9 @@
 
     function renderReportsList() {
       const container = document.getElementById('reportsList');
-      if (!reportsIndex || !reportsIndex.reports || reportsIndex.reports.length === 0) {
+      const learningReports = reportsIndex?.learningReports || [];
+      const marketReports = reportsIndex?.marketReports || [];
+      if (!reportsIndex || (learningReports.length === 0 && marketReports.length === 0)) {
         container.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">📋</div>
@@ -1714,19 +1797,35 @@
           </div>`;
         return;
       }
+      
+      // 合并学习报告和行情报告
+      const allReports = [
+        ...(reportsIndex.learningReports || []).map(r => ({...r, type: '学习报告'})),
+        ...(reportsIndex.marketReports || []).map(r => ({...r, type: '行情报告'}))
+      ].sort((a, b) => {
+        // 按日期和时间排序，最新的在前
+        const dateA = new Date(a.date + ' ' + a.time);
+        const dateB = new Date(b.date + ' ' + b.time);
+        return dateB - dateA;
+      });
+      
       let html = '';
-      reportsIndex.reports.forEach((r, i) => {
-        const sizeKB = (r.size / 1024).toFixed(1);
+      allReports.forEach((r, i) => {
         html += `
-          <div class="report-item ${i === 0 ? 'active' : ''}" data-url="${r.url}" data-date="${r.date}" data-title="${r.title}" data-meta="${r.sources}份源 · ${sizeKB}KB · ${r.days_ago}天前" onclick="loadReport(this)">
-            <div class="report-date">${r.date}</div>
-            <div class="report-title">${r.title}</div>
-            <div class="report-meta">${r.sources}份源 · ${sizeKB}KB · ${r.days_ago}天前</div>
+          <div class="report-item ${i === 0 ? 'active' : ''}" 
+               data-url="reports/${r.date}/${r.filename}" 
+               data-date="${r.date}" 
+               data-title="${r.jobName}" 
+               data-meta="${r.time} · ${r.type}"
+               onclick="loadReport(this)">
+            <div class="report-date">${r.date} ${r.time}</div>
+            <div class="report-title">${r.jobName}</div>
+            <div class="report-meta">${r.type}</div>
           </div>`;
       });
       container.innerHTML = html;
       // 自动加载第一份
-      if (reportsIndex.reports.length > 0) {
+      if (allReports.length > 0) {
         loadReport(container.querySelector('.report-item'));
       }
     }
@@ -1780,6 +1879,7 @@
       renderMarketIndices('marketIndices');
     });
     renderLearning('heroLearning');
+    renderTonightLearned();
     renderLearning('learningContent');
     loadMethodologyData();
     renderTimeline();
