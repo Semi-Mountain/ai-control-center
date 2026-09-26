@@ -1544,6 +1544,9 @@
         if (tsEl) tsEl.textContent = data.date + ' · ' + (data.theme || '');
         const papers = data.papers || [];
         const actions = data.actions || [];
+        // 9/27+ 新 schema: tonight_three_actions（执行验证周）
+        const tta = data.tonight_three_actions || [];
+        const weekly = data.weekly_status || null;
         const m = data.rsi_metrics || {};
         const im = m.immutable_layer_declared ? '✅' : '⏳';
         const rb = m.replay_buffer_ready ? '✅' : '⏳';
@@ -1557,12 +1560,28 @@
           </div>
         `).join('');
         const actionsHtml = actions.map((a, i) => `<li style="margin-bottom: 3px; color: #ccc; font-size: 11px;">→ ${a}</li>`).join('');
+        // 9/27 新字段渲染
+        const ttaHtml = tta.map(t => `
+          <div style="margin-bottom: 8px; padding: 8px 10px; background: rgba(76,183,130,0.08); border-radius: 4px; border-left: 2px solid #4CB782;">
+            <div style="display: flex; gap: 6px; margin-bottom: 4px;">
+              <span style="font-size: 10px; padding: 1px 5px; background: rgba(76,183,130,0.2); border-radius: 3px; color: #4CB782;">${t.id}</span>
+              <strong style="font-size: 12px; color: #fff;">${t.title}</strong>
+            </div>
+            <div style="font-size: 11px; color: #aaa; line-height: 1.5; margin-bottom: 3px;">${t.deliverable}</div>
+            <div style="font-size: 10px; color: #888; line-height: 1.4;">${t.evidence} · 解决: ${t.resolves_p0 || '-'}</div>
+          </div>
+        `).join('');
+        const weeklyHtml = weekly ? `
+          <div style="margin-top: 6px; padding: 6px 8px; background: rgba(255,165,0,0.06); border-radius: 3px; font-size: 10px; color: #ccc;">
+            📊 ${weekly.week} · 执行中 ${weekly.running_improvements} 条 · UI 落地率 ${weekly.ui_landing_rate_last_7d} · trace ${weekly.trace_replay_buffer}
+          </div>` : '';
         container.innerHTML = `
           <div style="padding: 12px 16px;">
             <div style="margin-bottom: 10px;">
               <strong style="font-size: 12px; color: #5E6AD2;">📄 核心论文</strong>
               <div style="margin-top: 6px;">${papersHtml || '<div style="color: #888; font-size: 11px;">暂无</div>'}</div>
             </div>
+            ${tta.length > 0 ? `<div style="margin-bottom: 10px;"><strong style="font-size: 12px; color: #4CB782;">🎯 今晚三个动作</strong><div style="margin-top: 6px;">${ttaHtml}</div></div>` : ''}
             <div style="margin-bottom: 10px;">
               <strong style="font-size: 12px; color: #4CB782;">⚡ 改进动作</strong>
               <ul style="margin: 6px 0 0; padding-left: 18px;">${actionsHtml}</ul>
@@ -1571,9 +1590,9 @@
               <div style="padding: 4px 6px; background: rgba(94,106,210,0.08); border-radius: 3px;"><div style="color: #888;">In-Dist</div><div style="font-size: 13px; font-weight: 600; color: #5E6AD2;">+${m.in_distribution_gain ?? '—'}</div></div>
               <div style="padding: 4px 6px; background: rgba(76,183,130,0.08); border-radius: 3px;"><div style="color: #888;">OOD</div><div style="font-size: 13px; font-weight: 600; color: #4CB782;">+${m.out_of_distribution_gain ?? '—'}</div></div>
               <div style="padding: 4px 6px; background: rgba(255,255,255,0.04); border-radius: 3px;"><div style="color: #888;">不变层</div><div style="font-size: 12px; color: #fff;">${im} #008</div></div>
-              <div style="padding: 4px 6px; background: rgba(255,255,255,0.04); border-radius: 3px;"><div style="color: #888;">Replay</div><div style="font-size: 12px; color: #fff;">${rb} #009</div></div>
+              <div style="padding: 4px 6px; background: rgba(255,255,255,0.04); border-radius: 3px;"><div style="color: #888;">Trace</div><div style="font-size: 12px; color: #fff;">${rb} #009</div><div style="font-size: 9px; color: #888;">9/27 首次跑通</div></div>
             </div>
-            <div style="margin-top: 8px; font-size: 10px; color: #666;">三层结构聚焦：<strong style="color: #fff;">${m.three_layer_focus || '—'}</strong></div>
+            <div style="margin-top: 8px; font-size: 10px; color: #666;">三层结构聚焦：<strong style="color: #fff;">${m.three_layer_focus || '—'}</strong>${weeklyHtml}</div>
           </div>
         `;
       } catch (e) {

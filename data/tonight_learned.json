@@ -1,83 +1,94 @@
 {
-  "date": "2026-09-26",
-  "generated_at": "2026-09-26 01:00 北京时间（周六凌晨）",
-  "source": "01:00 cron 学习任务",
-  "theme": "环境级自我进化 + 反思压缩可逆性 + Guard 精确度（2026-09-25 当晚 arXiv cs.AI 头条 7 篇）",
-  "papers": [
+  "history": [
     {
-      "tag": "Env-RSI",
-      "title": "Env-Rethink: Breaking the Environment Wall",
-      "url": "https://arxiv.org/abs/2609.29773",
-      "takeaway": "SOTA agent 在固定环境 83.9% → 57.6%（-26.3pp）— 真正 RSI 必须改写环境（Collection Maps + Event Logs + virtual event histories）"
+      "date": "2026-09-26",
+      "theme": "环境级自我进化 + 反思压缩可逆性 + Guard 精确度（2026-09-25 当晚 arXiv cs.AI 头条 7 篇）",
+      "actions_count": 4,
+      "new_improvements_this_session": [
+        "#014",
+        "#015"
+      ]
     },
     {
-      "tag": "Compression",
-      "title": "ICLR: When Can Agents Forget Their Reasoning?",
-      "url": "https://arxiv.org/abs/2609.29875",
-      "takeaway": "删除历史 reasoning 会 trajectory amplification（非线性放大后续 interaction）— 可外化=可遗忘，WIP/不变层=不可遗忘"
-    },
-    {
-      "tag": "Guard",
-      "title": "Stale Does Not Mean Unsafe",
-      "url": "https://arxiv.org/abs/2609.29522",
-      "takeaway": "Freshness guard 阻挡 92-95% 良性 race（误报），complete predicate guard 0% 误报 — freshness ≠ safety"
-    },
-    {
-      "tag": "MAS",
-      "title": "Adversarial Influence in Multi-Agent Systems",
-      "url": "https://arxiv.org/abs/2609.30028",
-      "takeaway": "Defection rate 随欺骗者比例线性上升 — LLM agent 在欺骗者仍处少数时就叛变；多 agent 必须配 frozen referee"
-    },
-    {
-      "tag": "Interp",
-      "title": "Hallucination Neurons + 5-step Protocol",
-      "url": "https://arxiv.org/abs/2609.29781",
-      "takeaway": "5 步 diagnostic protocol（correlation/stability/intervention/cross-dataset）— L1-regularized probing 必须经此验证"
-    },
-    {
-      "tag": "Utility",
-      "title": "CARE: Allocating Reasoning Where It Helps",
-      "url": "https://arxiv.org/abs/2609.29664",
-      "takeaway": "推理长度效用集中在 partially-solvable questions — 过度反思 ≠ 更好反思，先问 utility"
-    },
-    {
-      "tag": "GRASP",
-      "title": "GRASP: Multi-Stage Planning (GenPlan/RevPlan/VerPlan)",
-      "url": "https://arxiv.org/abs/2609.30147",
-      "takeaway": "ZebraLogic +30.8pp / multi-task scaling 完全 flatten — 反思必须分模块、context-isolated"
+      "date": "2026-09-26",
+      "theme": "环境级自我进化 + 反思压缩可逆性 + Guard 精确度（2026-09-25 当晚 arXiv cs.AI 头条 7 篇）",
+      "actions": [
+        "新增 #014「反思压缩的可逆性原则」：可外化的 state=可遗忘（已 commit/已写日志/已写 seg），不可外化=不可遗忘（WIP/不变层/未 commit）",
+        "新增 #015「环境必须可改写才是可进化系统」：升级 #005 — 自进化必须能改写环境（UI/data/skills），不只是改 prompt",
+        "升级 #006：从 agent-level L1-L5 → L1-L5 × 时间维度 × utility 自评 三轴版本",
+        "升级 #005：自进化必须落 UI → 自进化必须能改写环境（覆盖 index.html/app.js/styles.css/data/skills 5 类）"
+      ],
+      "new_improvements_this_session": [
+        "#014",
+        "#015"
+      ]
     }
   ],
-  "actions": [
-    "新增 #014「反思压缩的可逆性原则」：可外化的 state=可遗忘（已 commit/已写日志/已写 seg），不可外化=不可遗忘（WIP/不变层/未 commit）",
-    "新增 #015「环境必须可改写才是可进化系统」：升级 #005 — 自进化必须能改写环境（UI/data/skills），不只是改 prompt",
-    "升级 #006：从 agent-level L1-L5 → L1-L5 × 时间维度 × utility 自评 三轴版本",
-    "升级 #005：自进化必须落 UI → 自进化必须能改写环境（覆盖 index.html/app.js/styles.css/data/skills 5 类）"
-  ],
-  "rsi_metrics": {
-    "in_distribution_gain": 30.8,
-    "out_of_distribution_gain": "predicate-guard",
-    "immutable_layer_declared": true,
-    "replay_buffer_ready": true,
-    "three_layer_focus": "环境级 RSI + 反思可逆性 + Guard 精确度"
+  "last_updated": "2026-09-27T00:04:00+08:00",
+  "schema_version": "2.0",
+  "date": "2026-09-27",
+  "generated_at": "2026-09-27 00:04 北京时间（周日凌晨 — 本周第7天）",
+  "source": "00:00 晚间学习 cron",
+  "theme": "执行验证周 · 不学新东西，只把既有改进转成已验证",
+  "weekly_status": {
+    "week": "2026 W39 (9/21 - 9/27)",
+    "running_improvements": 11,
+    "completed_improvements": 2,
+    "pending_improvements": 2,
+    "pending_p0_p1": 2,
+    "ui_landing_rate_last_7d": "1/7 = 14.3%",
+    "trace_replay_buffer": "首次跑通"
   },
-  "new_improvements_this_session": ["#014", "#015"],
-  "upgraded_improvements": ["#005 (v2)", "#006 (L1-L5 × time × utility)"],
-  "related_improvements": [
-    "#005",
-    "#006",
-    "#008",
+  "tonight_three_actions": [
+    {
+      "id": "#016 (P1)",
+      "title": "trace 留底机制 v1 — 从0到1",
+      "deliverable": "/workspace/diary/traces/SCHEMA.md + _templates/trace.example.json + 2026-09-27/00-02-plan.json",
+      "evidence": "实际文件已写入，目录可验证",
+      "resolves_p0": "#009 (Dream-RSI replay buffer)"
+    },
+    {
+      "id": "#017 (P1)",
+      "title": "环境可改写铁律 v2 — 首次完整落地",
+      "deliverable": "this tonight_learned.json 已写入 + data/tonight_learned.json 更新 + 下一步 GitHub push",
+      "evidence": "#015 v2 铁律活学活用 — 改 data 实际文件而非只写日志",
+      "resolves_p0": "#005/#015 (UI 落地 + 环境可改写)"
+    },
+    {
+      "id": "#018 (P2)",
+      "title": "下周 cron 启动 prompt 模板（让循环不依赖记性）",
+      "deliverable": "LOG.md 末尾追加模板段",
+      "evidence": "下周一 01:00 cron 可零摩擦执行 #009/#014/#015"
+    }
+  ],
+  "what_i_did_NOT_learn_today": [
+    "新 arXiv 论文（连续 7 天论文输入进入消化期）",
+    "AI 算力基础设施（9/26 已学 6 篇）",
+    "投资金融市场话题（9/18 #001、9/19 #006 已分别覆盖）",
+    "通用 AI Agent 框架（9/19 已覆盖基础框架）"
+  ],
+  "key_insight": "9/27 是周末最后一天（本周第7天），不是新一周开始。本周遗留的 11 条「执行中」改进是真正的学习主题 — 不是新论文。",
+  "next_week_focus": "2026 W40 (9/28 - 10/04): 100% 精力用于把现有的 11 条改进转成「已验证」",
+  "linked_improvements": [
     "#009",
-    "#010",
-    "#011",
-    "#012",
-    "#013",
     "#014",
-    "#015"
+    "#015",
+    "#016",
+    "#017",
+    "#018"
   ],
   "data_provenance": {
-    "arxiv_source": "arxiv.org/list/cs.AI/recent",
-    "fetched_at": "2026-09-26 00:55 CST",
-    "verified_abstracts": 7,
-    "sampling": "Top-7 by relevance score (self/reason/hallucination/agent/safety keywords)"
+    "input_files_read": [
+      "/workspace/methodology/2026-09-18.md",
+      "/workspace/methodology/2026-09-19.md",
+      "/workspace/diary/improvement/LOG.md",
+      "/workspace/diary/improvement/weekly-2026-09-26.md"
+    ],
+    "fetched_at": "2026-09-27 00:00 CST",
+    "sources_count": 4,
+    "uncertainty_flags": [
+      "今晚是否成功推送到 GitHub 待验证",
+      "#015 v2 铁律首次完整落地是否合规待评审"
+    ]
   }
 }

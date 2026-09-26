@@ -1,0 +1,83 @@
+{
+  "date": "2026-09-26",
+  "generated_at": "2026-09-26 01:00 北京时间（周六凌晨）",
+  "source": "01:00 cron 学习任务",
+  "theme": "环境级自我进化 + 反思压缩可逆性 + Guard 精确度（2026-09-25 当晚 arXiv cs.AI 头条 7 篇）",
+  "papers": [
+    {
+      "tag": "Env-RSI",
+      "title": "Env-Rethink: Breaking the Environment Wall",
+      "url": "https://arxiv.org/abs/2609.29773",
+      "takeaway": "SOTA agent 在固定环境 83.9% → 57.6%（-26.3pp）— 真正 RSI 必须改写环境（Collection Maps + Event Logs + virtual event histories）"
+    },
+    {
+      "tag": "Compression",
+      "title": "ICLR: When Can Agents Forget Their Reasoning?",
+      "url": "https://arxiv.org/abs/2609.29875",
+      "takeaway": "删除历史 reasoning 会 trajectory amplification（非线性放大后续 interaction）— 可外化=可遗忘，WIP/不变层=不可遗忘"
+    },
+    {
+      "tag": "Guard",
+      "title": "Stale Does Not Mean Unsafe",
+      "url": "https://arxiv.org/abs/2609.29522",
+      "takeaway": "Freshness guard 阻挡 92-95% 良性 race（误报），complete predicate guard 0% 误报 — freshness ≠ safety"
+    },
+    {
+      "tag": "MAS",
+      "title": "Adversarial Influence in Multi-Agent Systems",
+      "url": "https://arxiv.org/abs/2609.30028",
+      "takeaway": "Defection rate 随欺骗者比例线性上升 — LLM agent 在欺骗者仍处少数时就叛变；多 agent 必须配 frozen referee"
+    },
+    {
+      "tag": "Interp",
+      "title": "Hallucination Neurons + 5-step Protocol",
+      "url": "https://arxiv.org/abs/2609.29781",
+      "takeaway": "5 步 diagnostic protocol（correlation/stability/intervention/cross-dataset）— L1-regularized probing 必须经此验证"
+    },
+    {
+      "tag": "Utility",
+      "title": "CARE: Allocating Reasoning Where It Helps",
+      "url": "https://arxiv.org/abs/2609.29664",
+      "takeaway": "推理长度效用集中在 partially-solvable questions — 过度反思 ≠ 更好反思，先问 utility"
+    },
+    {
+      "tag": "GRASP",
+      "title": "GRASP: Multi-Stage Planning (GenPlan/RevPlan/VerPlan)",
+      "url": "https://arxiv.org/abs/2609.30147",
+      "takeaway": "ZebraLogic +30.8pp / multi-task scaling 完全 flatten — 反思必须分模块、context-isolated"
+    }
+  ],
+  "actions": [
+    "新增 #014「反思压缩的可逆性原则」：可外化的 state=可遗忘（已 commit/已写日志/已写 seg），不可外化=不可遗忘（WIP/不变层/未 commit）",
+    "新增 #015「环境必须可改写才是可进化系统」：升级 #005 — 自进化必须能改写环境（UI/data/skills），不只是改 prompt",
+    "升级 #006：从 agent-level L1-L5 → L1-L5 × 时间维度 × utility 自评 三轴版本",
+    "升级 #005：自进化必须落 UI → 自进化必须能改写环境（覆盖 index.html/app.js/styles.css/data/skills 5 类）"
+  ],
+  "rsi_metrics": {
+    "in_distribution_gain": 30.8,
+    "out_of_distribution_gain": "predicate-guard",
+    "immutable_layer_declared": true,
+    "replay_buffer_ready": true,
+    "three_layer_focus": "环境级 RSI + 反思可逆性 + Guard 精确度"
+  },
+  "new_improvements_this_session": ["#014", "#015"],
+  "upgraded_improvements": ["#005 (v2)", "#006 (L1-L5 × time × utility)"],
+  "related_improvements": [
+    "#005",
+    "#006",
+    "#008",
+    "#009",
+    "#010",
+    "#011",
+    "#012",
+    "#013",
+    "#014",
+    "#015"
+  ],
+  "data_provenance": {
+    "arxiv_source": "arxiv.org/list/cs.AI/recent",
+    "fetched_at": "2026-09-26 00:55 CST",
+    "verified_abstracts": 7,
+    "sampling": "Top-7 by relevance score (self/reason/hallucination/agent/safety keywords)"
+  }
+}
