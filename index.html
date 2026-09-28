@@ -672,6 +672,11 @@
           <i>📅</i>
           <span class="nav-item-text">任务</span>
         </div>
+        <div class="nav-item" data-page="selfopt">
+          <i>🚀</i>
+          <span class="nav-item-text">自优化</span>
+          <span class="nav-badge" id="selfoptBadge">新</span>
+        </div>
         <div class="nav-item" data-page="introspect">
           <i>🔍</i>
           <span class="nav-item-text">自省</span>
@@ -791,6 +796,18 @@
           </div>
           <div id="heroMethodology">
             <!-- 动态加载 -->
+          </div>
+        </div>
+
+        <!-- 自优化进度（07:00自评自动更新） -->
+        <div class="card" style="margin-top: 16px; border-left: 3px solid #5E6AD2;">
+          <div class="card-header">
+            <span class="card-title">🚀 自优化进度</span>
+            <span class="card-subtitle" id="selfoptTimestamp">--</span>
+            <button class="refresh-btn" style="padding: 6px 12px; font-size: 12px;" onclick="showPage('selfopt')">查看详情 →</button>
+          </div>
+          <div id="heroSelfOpt">
+            <div style="padding: 12px 16px; color: #888; font-size: 12px;">加载中...</div>
           </div>
         </div>
 
@@ -1000,6 +1017,92 @@
         </div>
       </div>
       
+      <!-- 自优化页 -->
+      <div class="page" id="page-selfopt">
+        <div class="page-header">
+          <div>
+            <div class="page-title">自优化进度</div>
+            <div class="page-subtitle">6+1agent评估 · 7天滚动 · 防自欺</div>
+          </div>
+          <button class="refresh-btn" onclick="refreshSelfOpt()">
+            <span>🔄</span> 刷新
+          </button>
+        </div>
+
+        <!-- 架构说明 -->
+        <div class="card" style="border-left: 3px solid #5E6AD2;">
+          <div class="card-header">
+            <span class="card-title">🏗️ 架构</span>
+          </div>
+          <div id="selfoptArchitecture" style="padding: 16px; font-size: 13px; line-height: 1.8;">
+            <!-- 动态加载 -->
+          </div>
+        </div>
+
+        <!-- 7天滚动打分 -->
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-header">
+            <span class="card-title">📈 7天打分曲线</span>
+            <span class="card-subtitle">输入质量/学习深度/挖深深度/防自欺</span>
+          </div>
+          <div id="selfoptScoresChart" style="padding: 16px;">
+            <!-- 动态加载 -->
+          </div>
+        </div>
+
+        <!-- Agent明细 -->
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-header">
+            <span class="card-title">🤖 6+1 Agent 评估</span>
+          </div>
+          <div id="selfoptAgents" style="padding: 16px;">
+            <!-- 动态加载 -->
+          </div>
+        </div>
+
+        <!-- 落地率与被采纳率 -->
+        <div class="grid-2" style="margin-top: 16px;">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">✅ 落地率</span>
+            </div>
+            <div id="selfoptLandingRate" style="padding: 16px;">
+              <!-- 动态加载 -->
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">🔄 被采纳率</span>
+            </div>
+            <div id="selfoptAdoptionRate" style="padding: 16px;">
+              <!-- 动态加载 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 架构清理记录 -->
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-header">
+            <span class="card-title">🧹 架构清理记录</span>
+            <span class="card-subtitle">Agent 4b · 先保留后清理</span>
+          </div>
+          <div id="selfoptCleanupLog" style="padding: 16px;">
+            <!-- 动态加载 -->
+          </div>
+        </div>
+
+        <!-- 永久记忆铁律 -->
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-header">
+            <span class="card-title">📜 永久记忆铁律</span>
+            <span class="card-subtitle">permanent层 · 不删</span>
+          </div>
+          <div id="selfoptPermanent" style="padding: 16px;">
+            <!-- 动态加载 -->
+          </div>
+        </div>
+      </div>
+
       <!-- 工具分析页 -->
       <div class="page" id="page-tools">
         <div class="page-header">
@@ -1259,6 +1362,8 @@
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
       document.getElementById(`page-${page}`).classList.add('active');
+      // 进入自优化页时刷新一次
+      if (page === 'selfopt') renderSelfOpt();
     }
     
     // 更新时间
@@ -1544,9 +1649,6 @@
         if (tsEl) tsEl.textContent = data.date + ' · ' + (data.theme || '');
         const papers = data.papers || [];
         const actions = data.actions || [];
-        // 9/27+ 新 schema: tonight_three_actions（执行验证周）
-        const tta = data.tonight_three_actions || [];
-        const weekly = data.weekly_status || null;
         const m = data.rsi_metrics || {};
         const im = m.immutable_layer_declared ? '✅' : '⏳';
         const rb = m.replay_buffer_ready ? '✅' : '⏳';
@@ -1560,28 +1662,12 @@
           </div>
         `).join('');
         const actionsHtml = actions.map((a, i) => `<li style="margin-bottom: 3px; color: #ccc; font-size: 11px;">→ ${a}</li>`).join('');
-        // 9/27 新字段渲染
-        const ttaHtml = tta.map(t => `
-          <div style="margin-bottom: 8px; padding: 8px 10px; background: rgba(76,183,130,0.08); border-radius: 4px; border-left: 2px solid #4CB782;">
-            <div style="display: flex; gap: 6px; margin-bottom: 4px;">
-              <span style="font-size: 10px; padding: 1px 5px; background: rgba(76,183,130,0.2); border-radius: 3px; color: #4CB782;">${t.id}</span>
-              <strong style="font-size: 12px; color: #fff;">${t.title}</strong>
-            </div>
-            <div style="font-size: 11px; color: #aaa; line-height: 1.5; margin-bottom: 3px;">${t.deliverable}</div>
-            <div style="font-size: 10px; color: #888; line-height: 1.4;">${t.evidence} · 解决: ${t.resolves_p0 || '-'}</div>
-          </div>
-        `).join('');
-        const weeklyHtml = weekly ? `
-          <div style="margin-top: 6px; padding: 6px 8px; background: rgba(255,165,0,0.06); border-radius: 3px; font-size: 10px; color: #ccc;">
-            📊 ${weekly.week} · 执行中 ${weekly.running_improvements} 条 · UI 落地率 ${weekly.ui_landing_rate_last_7d} · trace ${weekly.trace_replay_buffer}
-          </div>` : '';
         container.innerHTML = `
           <div style="padding: 12px 16px;">
             <div style="margin-bottom: 10px;">
               <strong style="font-size: 12px; color: #5E6AD2;">📄 核心论文</strong>
               <div style="margin-top: 6px;">${papersHtml || '<div style="color: #888; font-size: 11px;">暂无</div>'}</div>
             </div>
-            ${tta.length > 0 ? `<div style="margin-bottom: 10px;"><strong style="font-size: 12px; color: #4CB782;">🎯 今晚三个动作</strong><div style="margin-top: 6px;">${ttaHtml}</div></div>` : ''}
             <div style="margin-bottom: 10px;">
               <strong style="font-size: 12px; color: #4CB782;">⚡ 改进动作</strong>
               <ul style="margin: 6px 0 0; padding-left: 18px;">${actionsHtml}</ul>
@@ -1590,13 +1676,218 @@
               <div style="padding: 4px 6px; background: rgba(94,106,210,0.08); border-radius: 3px;"><div style="color: #888;">In-Dist</div><div style="font-size: 13px; font-weight: 600; color: #5E6AD2;">+${m.in_distribution_gain ?? '—'}</div></div>
               <div style="padding: 4px 6px; background: rgba(76,183,130,0.08); border-radius: 3px;"><div style="color: #888;">OOD</div><div style="font-size: 13px; font-weight: 600; color: #4CB782;">+${m.out_of_distribution_gain ?? '—'}</div></div>
               <div style="padding: 4px 6px; background: rgba(255,255,255,0.04); border-radius: 3px;"><div style="color: #888;">不变层</div><div style="font-size: 12px; color: #fff;">${im} #008</div></div>
-              <div style="padding: 4px 6px; background: rgba(255,255,255,0.04); border-radius: 3px;"><div style="color: #888;">Trace</div><div style="font-size: 12px; color: #fff;">${rb} #009</div><div style="font-size: 9px; color: #888;">9/27 首次跑通</div></div>
+              <div style="padding: 4px 6px; background: rgba(255,255,255,0.04); border-radius: 3px;"><div style="color: #888;">Replay</div><div style="font-size: 12px; color: #fff;">${rb} #009</div></div>
             </div>
-            <div style="margin-top: 8px; font-size: 10px; color: #666;">三层结构聚焦：<strong style="color: #fff;">${m.three_layer_focus || '—'}</strong>${weeklyHtml}</div>
+            <div style="margin-top: 8px; font-size: 10px; color: #666;">三层结构聚焦：<strong style="color: #fff;">${m.three_layer_focus || '—'}</strong></div>
           </div>
         `;
       } catch (e) {
         container.innerHTML = `<div style="padding: 12px 16px; color: #888; font-size: 11px;">加载失败：${e.message}</div>`;
+      }
+    }
+
+    async function renderSelfOpt() {
+      const container = document.getElementById('heroSelfOpt');
+      const tsEl = document.getElementById('selfoptTimestamp');
+      const archEl = document.getElementById('selfoptArchitecture');
+      const chartEl = document.getElementById('selfoptScoresChart');
+      const agentsEl = document.getElementById('selfoptAgents');
+      const landingEl = document.getElementById('selfoptLandingRate');
+      const adoptionEl = document.getElementById('selfoptAdoptionRate');
+      const cleanupEl = document.getElementById('selfoptCleanupLog');
+      const permEl = document.getElementById('selfoptPermanent');
+
+      // 加载数据
+      const dataUrl = 'https://raw.githubusercontent.com/Semi-Mountain/ai-control-center/main/data/self_optimization.json?t=' + Date.now();
+      let data;
+      try {
+        const r = await fetch(dataUrl);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        data = await r.json();
+      } catch (e) {
+        if (container) container.innerHTML = `<div style="padding: 12px 16px; color: #888; font-size: 11px;">加载失败：${e.message}</div>`;
+        return;
+      }
+
+      if (tsEl) tsEl.textContent = data.generated_at || '--';
+
+      // 架构说明
+      if (archEl && data.architecture) {
+        const arch = data.architecture;
+        const agentsHtml = (arch.agents || []).map(a =>
+          `<div style="display: flex; gap: 8px; padding: 4px 0; font-size: 11px;">
+            <span style="color: #5E6AD2; font-weight: 600; min-width: 40px;">Agent ${a.id}</span>
+            <span style="color: #fff; flex: 1;">${a.name}</span>
+            <span style="color: #888;">${a.scope}</span>
+          </div>`
+        ).join('');
+        const princHtml = (arch.principles || []).map(p =>
+          `<li style="margin-bottom: 4px; color: #ccc; font-size: 11px;">${p}</li>`
+        ).join('');
+        archEl.innerHTML = `
+          <div style="margin-bottom: 8px;"><strong style="color: #5E6AD2;">${arch.name}</strong><span style="color: #888; font-size: 11px; margin-left: 8px;">建于 ${arch.established}</span></div>
+          <div style="margin-bottom: 8px;"><strong style="font-size: 11px; color: #aaa;">Agents:</strong>${agentsHtml}</div>
+          <div><strong style="font-size: 11px; color: #aaa;">原则:</strong><ul style="margin: 4px 0 0; padding-left: 18px;">${princHtml}</ul></div>
+        `;
+      }
+
+      // 7天打分曲线
+      if (chartEl && data.scores_history) {
+        const history = data.scores_history;
+        const metrics = ['input_quality', 'learning_depth', 'deepness', 'anti_self_deception'];
+        const metricLabels = { input_quality: '输入质量', learning_depth: '学习深度', deepness: '挖深深度', anti_self_deception: '防自欺' };
+        const days = history.slice(-7);
+
+        // 简单ASCII风格的柱状展示
+        const rows = metrics.map(m => {
+          const cells = days.map(d => {
+            const v = d[m];
+            const txt = v === null || v === undefined ? '—' : v;
+            const color = v === null ? '#444' : (v >= 8 ? '#4CB782' : v >= 6 ? '#FBBF24' : '#F87171');
+            return `<td style="padding: 4px 8px; color: ${color}; text-align: center; font-weight: 600;">${txt}</td>`;
+          }).join('');
+          return `<tr><td style="padding: 4px 8px; color: #aaa; font-size: 11px;">${metricLabels[m]}</td>${cells}</tr>`;
+        }).join('');
+
+        const headers = days.map(d =>
+          `<th style="padding: 4px 8px; color: #888; font-size: 10px; text-align: center;">${d.date.slice(5)}</th>`
+        ).join('');
+
+        chartEl.innerHTML = `
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead><tr><th style="padding: 4px 8px; color: #888; font-size: 10px; text-align: left;"></th>${headers}</tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+          <div style="margin-top: 8px; font-size: 10px; color: #666;">⚠️ 07:00自评首次跑后填入真实打分</div>
+        `;
+      }
+
+      // Agent 明细
+      if (agentsEl && data.architecture) {
+        const agents = data.architecture.agents || [];
+        const cards = agents.map(a => {
+          const isDevil = a.id === 7;
+          const borderColor = isDevil ? '#F87171' : '#5E6AD2';
+          return `
+            <div style="padding: 10px 12px; background: rgba(94,106,210,0.04); border-radius: 6px; border-left: 2px solid ${borderColor}; margin-bottom: 8px;">
+              <div style="display: flex; align-items: baseline; gap: 6px; margin-bottom: 4px;">
+                <span style="font-size: 10px; padding: 1px 5px; background: rgba(94,106,210,0.2); border-radius: 3px; color: #5E6AD2;">Agent ${a.id}</span>
+                <strong style="font-size: 12px; color: #fff;">${a.name}</strong>
+                ${isDevil ? '<span style="font-size: 10px; color: #F87171;">devil\'s advocate</span>' : ''}
+              </div>
+              <div style="font-size: 11px; color: #aaa;">${a.scope}</div>
+            </div>
+          `;
+        }).join('');
+        agentsEl.innerHTML = cards;
+      }
+
+      // 落地率
+      if (landingEl) {
+        const landing = data.landing_rate || {};
+        const hist = landing.history || [];
+        if (hist.length === 0) {
+          landingEl.innerHTML = `<div style="color: #888; font-size: 12px;">首次跑后填入：提出X个共识改进点，今晚真改Y个 = Y/X%</div>`;
+        } else {
+          const rows = hist.map(h => `<div style="font-size: 11px; padding: 3px 0; color: #ccc;">${h.date}: <strong style="color: #5E6AD2;">${h.rate}</strong> (${h.changed}/${h.proposed})</div>`).join('');
+          landingEl.innerHTML = `<div style="font-size: 11px; color: #aaa; margin-bottom: 6px;">${landing.definition || ''}</div>${rows}`;
+        }
+      }
+
+      // 被采纳率
+      if (adoptionEl) {
+        const adoption = data.adoption_rate || {};
+        const hist = adoption.history || [];
+        if (hist.length === 0) {
+          adoptionEl.innerHTML = `<div style="color: #888; font-size: 12px;">首次跑后填入：上轮改进方向，下一个07:00回看时真产生效果的比例</div>`;
+        } else {
+          const rows = hist.map(h => `<div style="font-size: 11px; padding: 3px 0; color: #ccc;">${h.date}: <strong style="color: #4CB782;">${h.rate}</strong></div>`).join('');
+          adoptionEl.innerHTML = `<div style="font-size: 11px; color: #aaa; margin-bottom: 6px;">${adoption.definition || ''}</div>${rows}`;
+        }
+      }
+
+      // 清理记录
+      if (cleanupEl) {
+        const logs = data.cleanup_log || [];
+        if (logs.length === 0) {
+          cleanupEl.innerHTML = `<div style="color: #888; font-size: 12px;">暂无清理记录</div>`;
+        } else {
+          const html = logs.map(log => {
+            const items = (log.deleted || []).map(d => {
+              const icon = d.type === 'file' ? '📄' : '⏰';
+              return `<div style="font-size: 11px; padding: 3px 0; color: #ccc;"><span style="color: #F87171;">${icon} 删除</span> ${d.path || d.id} <span style="color: #888;">— ${d.reason}</span></div>`;
+            }).join('');
+            const eval = log.evaluation || {};
+            return `
+              <div style="padding: 10px 12px; background: rgba(248,113,113,0.04); border-radius: 6px; border-left: 2px solid #F87171; margin-bottom: 10px;">
+                <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px;">
+                  <strong style="color: #fff; font-size: 12px;">${log.date}</strong>
+                  <span style="color: #888; font-size: 11px;">${log.trigger}</span>
+                </div>
+                <div style="margin-bottom: 6px;">${items}</div>
+                <div style="font-size: 10px; padding: 4px 6px; background: rgba(76,183,130,0.08); border-radius: 3px; color: #4CB782;">
+                  ${eval.结论 || eval.评分差距 || '已评估'} · 备份: ${log.backup || '—'}
+                </div>
+              </div>
+            `;
+          }).join('');
+          cleanupEl.innerHTML = html;
+        }
+      }
+
+      // 永久记忆铁律
+      if (permEl) {
+        const mems = data.permanent_memory || [];
+        const html = mems.map((m, i) =>
+          `<div style="padding: 6px 10px; background: rgba(94,106,210,0.04); border-radius: 4px; margin-bottom: 6px; font-size: 11px; color: #ccc;">
+            <span style="color: #5E6AD2; font-weight: 600;">${i+1}.</span> ${m}
+          </div>`
+        ).join('');
+        permEl.innerHTML = html || '<div style="color: #888; font-size: 12px;">暂无</div>';
+      }
+
+      // 首页简化版（hero）
+      if (container) {
+        const today = data.today_score || {};
+        const todayDate = today.date || '--';
+        const isPending = today.pending_first_run;
+        const html = isPending
+          ? `<div style="padding: 12px 16px;">
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                <div style="padding: 8px 10px; background: rgba(255,255,255,0.04); border-radius: 4px;">
+                  <div style="color: #888; font-size: 10px;">评分状态</div>
+                  <div style="color: #FBBF24; font-size: 13px; font-weight: 600;">⏳ 待07:00首跑</div>
+                </div>
+                <div style="padding: 8px 10px; background: rgba(255,255,255,0.04); border-radius: 4px;">
+                  <div style="color: #888; font-size: 10px;">架构清理</div>
+                  <div style="color: #4CB782; font-size: 13px; font-weight: 600;">✓ ${(data.cleanup_log || []).length} 次</div>
+                </div>
+                <div style="padding: 8px 10px; background: rgba(255,255,255,0.04); border-radius: 4px;">
+                  <div style="color: #888; font-size: 10px;">6+1 Agents</div>
+                  <div style="color: #5E6AD2; font-size: 13px; font-weight: 600;">已就绪</div>
+                </div>
+                <div style="padding: 8px 10px; background: rgba(255,255,255,0.04); border-radius: 4px;">
+                  <div style="color: #888; font-size: 10px;">永久铁律</div>
+                  <div style="color: #5E6AD2; font-size: 13px; font-weight: 600;">${(data.permanent_memory || []).length} 条</div>
+                </div>
+              </div>
+              <div style="margin-top: 8px; padding: 6px 10px; background: rgba(94,106,210,0.08); border-radius: 4px; font-size: 11px; color: #5E6AD2;">
+                💡 07:00自评启动后，会自动写入：今日打分 + 落地率 + 被采纳率
+              </div>
+            </div>`
+          : `<div style="padding: 12px 16px;">
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                <div style="padding: 8px 10px; background: rgba(255,255,255,0.04); border-radius: 4px;">
+                  <div style="color: #888; font-size: 10px;">输入质量</div>
+                  <div style="color: #5E6AD2; font-size: 13px; font-weight: 600;">${today.input_quality ?? '—'} / 10</div>
+                </div>
+                <div style="padding: 8px 10px; background: rgba(255,255,255,0.04); border-radius: 4px;">
+                  <div style="color: #888; font-size: 10px;">挖深深度</div>
+                  <div style="color: #5E6AD2; font-size: 13px; font-weight: 600;">${today.deepness ?? '—'} / 10</div>
+                </div>
+              </div>
+            </div>`;
+        container.innerHTML = html;
       }
     }
 
@@ -1638,7 +1929,12 @@
       });
       renderLearning('heroLearning');
       renderTonightLearned();
+      renderSelfOpt();
       renderTimeline();
+    }
+
+    function refreshSelfOpt() {
+      renderSelfOpt();
     }
 
     function refreshStocks() {
@@ -1899,6 +2195,7 @@
     });
     renderLearning('heroLearning');
     renderTonightLearned();
+    renderSelfOpt();
     renderLearning('learningContent');
     loadMethodologyData();
     renderTimeline();

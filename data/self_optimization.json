@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-09-29 01:55 北京时间",
+  "architecture": {
+    "name": "学习-自评-改架构-留档 同一天闭环",
+    "established": "2026-09-29",
+    "agents": [
+      {"id": 1, "name": "学习质量评估师", "scope": "输入质量+学习深度+挖深深度"},
+      {"id": 2, "name": "记忆与上下文架构师", "scope": "memory/context缺陷"},
+      {"id": 3, "name": "Prompt与指令工程师", "scope": "cron prompt优化"},
+      {"id": 4, "name": "Agent协作架构师", "scope": "agent分工/辩论/评估流程"},
+      {"id": "4b", "name": "架构清理评估师", "scope": "清理旧架构+提炼保留"},
+      {"id": 5, "name": "自我进化机制审计师", "scope": "防自欺+7天趋势"},
+      {"id": 6, "name": "爸爸对话效率分析师", "scope": "沟通模式"},
+      {"id": 7, "name": "反方agent", "scope": "devil's advocate，质疑共识"}
+    ],
+    "principles": [
+      "同一天闭环：00:00规划→01-06学习→07:00自评-改-留档",
+      "挖深铁律：≥3信息源+挖3层+追原始论文+12个月内+爸爸相关性自检",
+      "防自欺：Agent 5审计+反方agent挑战+不达成共识不动手",
+      "改动前必备份+白灰黑名单+改后必验证+失败回滚",
+      "7天滚动对比：今天 vs 昨天 vs 前天 vs 7天均值",
+      "架构清理：评分≥8分差距+先提炼再删+验证留档"
+    ]
+  },
+  "today_score": {
+    "date": "2026-09-29",
+    "pending_first_run": true,
+    "note": "07:00首次跑，待生成"
+  },
+  "scores_history": [
+    {"date": "2026-09-23", "input_quality": null, "learning_depth": null, "deepness": null, "anti_self_deception": null, "note": "新指标启用前，无数据"},
+    {"date": "2026-09-24", "input_quality": null, "learning_depth": null, "deepness": null, "anti_self_deception": null},
+    {"date": "2026-09-25", "input_quality": null, "learning_depth": null, "deepness": null, "anti_self_deception": null},
+    {"date": "2026-09-26", "input_quality": null, "learning_depth": null, "deepness": null, "anti_self_deception": null},
+    {"date": "2026-09-27", "input_quality": null, "learning_depth": null, "deepness": null, "anti_self_deception": null},
+    {"date": "2026-09-28", "input_quality": null, "learning_depth": null, "deepness": null, "anti_self_deception": null},
+    {"date": "2026-09-29", "input_quality": null, "learning_depth": null, "deepness": null, "anti_self_deception": null, "note": "今日待生成"}
+  ],
+  "landing_rate": {
+    "definition": "提出共识改进点中，今晚真动手改的比例",
+    "history": []
+  },
+  "adoption_rate": {
+    "definition": "上次提出的改进方向，下一个07:00回看时真产生效果的比例",
+    "history": []
+  },
+  "cleanup_log": [
+    {
+      "date": "2026-09-29",
+      "trigger": "Agent 4b首次评估",
+      "deleted": [
+        {"type": "file", "path": "/workspace/methodology/明日改进计划.md", "reason": "被新格式'明日改进计划_YYYY-MM-DD.md'替代"},
+        {"type": "file", "path": "/workspace/methodology/周一cron启动prompt.md", "reason": "09-27临时启动器，过期"},
+        {"type": "cron", "id": "a5d30efa103c", "name": "每周改进检查-周六00:00", "reason": "功能被07:00自评的7天滚动窗口覆盖"}
+      ],
+      "提炼保留": [],
+      "evaluation": {
+        "评分差距": "新架构≥旧架构 +16分（满分16，8维度每维新+2）",
+        "结论": "评分≥8分阈值，可清理"
+      },
+      "backup": "/root/.hermes/cron/backups/2026-09-29_01-50/"
+    }
+  ],
+  "permanent_memory": [
+    "【核心铁律】学习-自评-改架构-留档 同一天闭环",
+    "【核心铁律】挖深铁律：≥3源+3层+追原始+12月内+爸爸相关性",
+    "【核心铁律】5条优化：备份/相关性/反方/7天窗口/memory分层",
+    "【核心铁律】架构清理铁律：评分≥8分差距+先保留后清"
+  ]
+}
