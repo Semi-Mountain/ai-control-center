@@ -1,0 +1,26 @@
+{
+  "sampling_date": "2026-09-28",
+  "sampling_time_local": "03:00",
+  "sampling_method": "manual_first_run",
+  "sampling_target": "#006 量化 4 子指标首次采样",
+  "samples": [
+    {"trace": "traces/2026-09-27/00-02-plan.json", "score": {"c1": 1, "c2": 0, "c3": 0, "c4": 0}},
+    {"trace": "traces/2026-09-28/00-00-boot.json", "score": {"c1": 1, "c2": 1, "c3": 1, "c4": 0}},
+    {"trace": "traces/2026-09-28/01-04-learn.json", "score": {"c1": 1, "c2": 1, "c3": 1, "c4": 1}},
+    {"note": "methodology/学习笔记_2026-09-28_01.md", "score": {"c1": 1, "c2": 1, "c3": 1, "c4": 1}},
+    {"note": "methodology/学习笔记_2026-09-28_02.md", "score": {"c1": 1, "c2": 0, "c3": 1, "c4": 0}}
+  ],
+  "sub_indicators": {
+    "c1_conclusion_first_rate": {"value": 1.0, "threshold": 0.7, "status": "PASS"},
+    "c2_data_with_drift_ratio": {"value": 0.6, "threshold": 0.5, "status": "PASS"},
+    "c3_l1_l5_hit_rate": {"value": 1.0, "threshold": 1.0, "status": "PASS"},
+    "c4_scenario_template_hit_rate": {"value": 0.33, "threshold": 0.7, "status": "FAIL"}
+  },
+  "composite_score": 0.7325,
+  "threshold": 0.70,
+  "verdict": "PASS_SINGLE",
+  "promoted_to": "首次量化验证通过（待 3 周滚动 ≥70%）",
+  "next_sampling_date": "2026-09-29",
+  "linked_improvements": ["#006", "#023", "#025", "#037"],
+  "created_by": "wowzai"
+}
