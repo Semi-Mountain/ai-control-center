@@ -1,0 +1,16 @@
+{
+  "id": "bae289049006",
+  "date": "2026-09-30",
+  "time": "13:17",
+  "title": "节前早盘提示报告 · 2026-09-30",
+  "type": "morning_pre_trading",
+  "file": "/root/.hermes/cron/output/bae289049006/2026-09-30-early/report.md",
+  "news_count": 20,
+  "holdings": [
+    "000988.SZ",
+    "000582.SZ",
+    "600118.SH"
+  ],
+  "data_source": "tushare_pro+qq_quote+manual",
+  "status": "success"
+}

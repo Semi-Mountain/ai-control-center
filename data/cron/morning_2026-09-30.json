@@ -1,0 +1,16 @@
+{
+  "id": "df86155a683d",
+  "date": "2026-09-30",
+  "time": "11:30",
+  "title": "早盘提示报告 · 2026-09-30",
+  "type": "morning_pre_trading",
+  "file": "/root/.hermes/cron/output/df86155a683d/2026-09-30_11-30-58.md",
+  "news_count": 25,
+  "holdings": [
+    "000988.SZ",
+    "000582.SZ",
+    "600118.SH"
+  ],
+  "data_source": "tushare_pro",
+  "status": "success_with_fallback"
+}
