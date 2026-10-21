@@ -1,0 +1,18 @@
+# ============================================================================
+# dist/.gitignore —— 独立 repo（gh-pages 发布）侧的构建产物排除
+# ⚠️ dist 是独立 git repo（父 repo 记为 gitlink mode=160000，无 .gitmodules）
+#    这是 wowzai-panel-sync 技能记载的历史设计，不要重构
+# ============================================================================
+
+# 依赖（96M 构建产物，不该进版本库）
+node_modules/
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+
+# 临时文件
+*.bak
+*.tmp
+.DS_Store
+.category
