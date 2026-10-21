@@ -1,18 +1,42 @@
 # ============================================================================
-# dist/.gitignore —— 独立 repo（gh-pages 发布）侧的构建产物排除
-# ⚠️ dist 是独立 git repo（父 repo 记为 gitlink mode=160000，无 .gitmodules）
-#    这是 wowzai-panel-sync 技能记载的历史设计，不要重构
+# ai-control-center .gitignore
+# 2026-10-21 新建 —— 治理"构建产物进 git"问题
+# 背景：node_modules 4832 个文件（96M）被跟踪进版本库，仓库臃肿且每次 sync 都产生巨量 diff
 # ============================================================================
 
-# 依赖（96M 构建产物，不该进版本库）
+# --- 依赖 / 构建产物 ---
 node_modules/
+*.log
+npm-debug.log*
+yarn-error.log*
+.cache/
+.vite/
+build/
+.next/
 
-# Python 缓存
+# --- Python 缓存 ---
 __pycache__/
 *.py[cod]
+*.pyo
+.pytest_cache/
+.ruff_cache/
 
-# 临时文件
+# --- 环境变量 / 本地配置 ---
+.env
+.env.local
+.env.*.local
+
+# --- 临时文件 ---
 *.bak
 *.tmp
+*.swp
 .DS_Store
+Thumbs.db
+force_refresh.txt
+
+# --- 编辑器 ---
+.vscode/
+.idea/
+
+# --- 分类标记（系统自动生成）---
 .category
