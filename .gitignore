@@ -1,0 +1,42 @@
+# ============================================================================
+# ai-control-center .gitignore
+# 2026-10-21 新建 —— 治理"构建产物进 git"问题
+# 背景：node_modules 4832 个文件（96M）被跟踪进版本库，仓库臃肿且每次 sync 都产生巨量 diff
+# ============================================================================
+
+# --- 依赖 / 构建产物 ---
+node_modules/
+*.log
+npm-debug.log*
+yarn-error.log*
+.cache/
+.vite/
+build/
+.next/
+
+# --- Python 缓存 ---
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.ruff_cache/
+
+# --- 环境变量 / 本地配置 ---
+.env
+.env.local
+.env.*.local
+
+# --- 临时文件 ---
+*.bak
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+force_refresh.txt
+
+# --- 编辑器 ---
+.vscode/
+.idea/
+
+# --- 分类标记（系统自动生成）---
+.category
